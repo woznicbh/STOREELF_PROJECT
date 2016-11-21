@@ -1,0 +1,59 @@
+WITH REGIONS AS
+ (SELECT trim(r.REGION_NAME) AS region,
+ r.region_key
+ FROM  YFS_REGION r
+ WHERE r.REGION_SCHEMA_KEY = 'ALL_US'
+ AND r.REGION_LEVEL_NAME   = 'Region'
+ AND r.region_name        <> 'APOFPO'
+ ) ,
+ STATES AS
+ (SELECT trim(r2.region_name) AS state,
+ r2.REGION_KEY              AS stateid,
+ r.region_key               AS regionid
+ FROM regions r,
+  yfs_region r2
+ WHERE r2.REGION_SCHEMA_KEY       = 'ALL_US'
+ AND r2.region_level_name         = 'State'
+ AND r2.PARENT_REGION_KEY         = r.region_key
+ AND LENGTH(trim(r2.REGION_NAME)) = 2
+ ) ,
+ STORES AS
+ (SELECT trim(p.state) AS state,
+ s.SHIPNODE_KEY      AS storeid,
+ states.stateid
+ FROM  yfs_ship_node s,
+  yfs_person_info p,
+ STATES states
+ WHERE s.NODE_TYPE     = 'STORE'
+ AND p.PERSON_INFO_KEY = s.SHIP_NODE_ADDRESS_KEY
+ AND states.state      = trim(p.STATE)
+ ),
+ Shipped_Units AS
+ (SELECT sa.regionid,
+ SUM(stat.status_quantity) AS quantity
+ FROM  Yfs_order_release rel ,
+  Yfs_order_release_status stat ,
+  Yfs_order_header head ,
+  yfs_ship_node node ,
+ STORES st ,
+ STATES sa
+ WHERE UPPER(node.NODE_TYPE) = 'STORE'
+ AND rel.SHIPNODE_KEY        = node.SHIPNODE_KEY
+ AND rel.document_type       ='0001'
+ AND stat.order_release_key  = rel.order_release_key
+ AND stat.status            >='1500'
+ AND stat.status_quantity    >0
+ AND Head.Order_Header_Key   = Rel.Order_Header_Key
+ AND head.order_date         > TO_CHAR(SYSDATE, 'DD-Mon-YY')
+ AND head.order_date         < TO_CHAR(SYSDATE+1, 'DD-Mon-YY')
+ AND head.enterprise_key     ='STOREELF.COM'
+ AND head.document_type      ='0001'
+ AND st.storeid              = node.shipnode_key
+ AND st.state                = sa.state
+ GROUP BY sa.regionid
+ )
+ SELECT REGIONS.region,
+ NVL(Shipped_Units.quantity,0) quantity
+ FROM REGIONS
+ LEFT OUTER JOIN Shipped_Units
+ ON REGIONS.region_key=Shipped_Units.regionid 

@@ -1,0 +1,4 @@
+select th.task_id, th.create_date_time, th.mod_date_time, th.user_id, th.stat_code,
+ (select code_desc from sys_code where rec_type = 'S' and code_type = '552' and to_number(code_id) = th.stat_code) as status
+ from task_hdr th
+ where th.task_id = '%s'

@@ -1,0 +1,4 @@
+select ch.carton_nbr, ch.misc_instr_code_1 as type, ch.misc_instr_code_3 as singles, ch.misc_instr_code_5 as divert, ch.carton_grp_code, 
+ ch.chute_assign_type, ch.chute_id
+ from carton_hdr ch
+ where ch.carton_nbr = '%s'

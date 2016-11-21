@@ -1,0 +1,46 @@
+select 
+  replace(substr(msg, instr(msg, 'Type'),7),':', '') as "Purge Type",
+  decode  (rtrim(replace(substr(msg, instr(msg, 'Type'),7),':', '')),
+    'Type 1',	'Appointments In/Out  Purge',
+    'Type 2',	'ASN Data Purge',
+    'Type 3',	'PIX Data Purge',
+    'Type 4',	'Case Data  Purge',
+    'Type 5',	'Immediate Needs Data  Purge',
+    'Type 6',	'MSG_LOG Purge',
+    'Type 7',	'Pickticket Data Purge',
+    'Type 8',	'Task Data Purge',
+    'Type 9',	'Wave Data Purge',
+    'Type 11',	'Reports Data Purge',
+    'Type 12',	'Pick Location Data Purge',
+    'Type 14',	'PO Data Purge',
+    'Type 18',	'Allocation Data Purge',
+    'Type 20',	'Task Parm Table Purge',
+    'Type 21',	'Output Tables Purge',
+    'Type 22',	'Parcel Manifest Purge',
+    'Type 23',	'Event Message Purge Purge',
+    'Type 24',	'Labor Mgnt Q Purge Purge',
+    'Type 26',	'Cycle Count history table Purge',
+    'Type 31',	'Serial Number Purge Purge',
+    'Type 32',	'Rate Shop Transaction Purge Purge',
+    'Type 34',	'Activity Tracking Transaction Purge',
+    'Type 52',	'Divert History Purge',
+                'Unknown Purge') as "Purge",
+  decode  (MSG_ID,
+    '1212', 'Start',
+    '1213', 'End',
+            'Error') as "Progress",
+  --  instr(msg, 'Error'),
+  to_char(LOG_DATE_TIME, 'MM/DD HH24:mi:ss') as "Time",
+  CASE WHEN MSG like '%ORA%' THEN 'Oracle Error' 
+  ELSE MSG 
+  END MSG,
+  MSG_LOG_ID
+ from msg_log 
+ where pgm_id = 'PURGE'
+  AND not (MSG like '%Purged%'
+        or MSG like '%Archived%'
+        or MSG like '%Updated%') -- Removes progress messages
+  AND LOG_DATE_TIME > sysdate - 3
+  order by log_date_time DESC, 
+  replace(substr(msg, instr(msg, 'Type'),7),':', ''),
+  LOG_DATE_TIME

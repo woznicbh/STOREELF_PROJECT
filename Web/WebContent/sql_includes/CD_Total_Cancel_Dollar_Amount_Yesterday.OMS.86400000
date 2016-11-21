@@ -1,0 +1,6 @@
+ with v1 as (select /*+ parallel(8) full(line) full(ors) full(head)*/  ors.status_quantity * line.unit_price as dollar_value from sterling.yfs_order_line line, sterling.yfs_order_header head, 
+  STERLING.yfs_order_release_status ors where ors.order_release_status_key > TO_CHAR(SYSDATE - 1,'YYYYMMDD')  
+  and ors.order_release_status_key < TO_CHAR(SYSDATE,'YYYYMMDD') and                                          
+  ors.status_quantity > 0 and ors.status = '9000'  and line.order_line_key = ors.order_line_key and head.document_type = '0001' and head.order_header_key  = line.order_header_key)              
+  select TRIM(TO_CHAR(sum(dollar_value),'$999,999,999,999,999.99')) AS "COUNT" from v1                      
+ 

@@ -1,0 +1,22 @@
+) Common Deployment storeelf issues
+) Common functional issues
+	If you are unable to login running local isntance of storeelf please validate the SSL setting in storeelf's shiro.ini
+	are commented with '#' to disable. 
+
+)Build/Deploy Scripts
+	/com.storeelf.report.web/build/com.storeelf.web.ant.LOCAL.SPLIT.DEPLOY.PROD_LIST_LITE.xml
+	/com.storeelf.report.web/build/com.storeelf.web.ant.LOCAL.SPLIT.DEPLOY.QA_LITE.xml
+	/com.storeelf.report.web/build/com.storeelf.web.ant.LOCAL.SPLIT.DEPLOY.TEST_LITE.xml
+
+)HTML widgets and Examples are located in:	
+	/com.storeelf.report.web/TEMPLATE_EXAMPLE_FILES
+	
+)Tomcat NOTICE:
+	Before you take advantage of any of the 'LITE' build scripts you must confirm a copy of each dependent jar file exists within Tomcat's /lib directory
+	
+)Hazelcast NOTICE:
+	Hazelcast will NOT fire up until the first servlet is executed, meaning immediately after the Apache Tomcat service has started, 
+	open each section/webapp in your browser
+	
+)Hudson NOTICE:
+	all SSH keys should exist in 'C:\Windows\system32\config\systemprofile\.ssh' this is the profile folder for SYSTEM user

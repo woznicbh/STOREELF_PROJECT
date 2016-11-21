@@ -1,0 +1,15 @@
+select pd.pkt_seq_nbr, pd.sku_id, pd.orig_pkt_qty as orig_qty, pd.pkt_qty as pkt_qty, pd.cancel_qty as canc_qty, 
+ pd.to_be_verf_as_pakd as to_be_verf, 
+ pd.verf_as_pakd as verf_pakd, pd.units_pakd, pd.spl_instr_code_2, pd.stat_code || ' ' || sc.code_desc as status,
+ case im.convey_flag when '1' then 'SORT'
+                     when '2' then 'NON-SORT'
+                     when '3' then 'CAGE'
+                     else 'INVALID'
+ end as CONVEY_FLAG,
+ pd.chute_assign_type as chute_asgn,
+ pd.carton_type,
+ pd.user_id
+ from pkt_dtl pd
+ left join item_master im on im.sku_id = pd.sku_id
+ left join sys_code sc on sc.rec_type = 'S' and sc.code_type = '808' and to_number(sc.code_id) = pd.stat_code
+ where pd.pkt_ctrl_nbr = '%s'

@@ -1,0 +1,1 @@
+select /*+ parallel(8) full(kl_hard_totals) */ trim(TO_CHAR(sum(merchandise_total),'$999,999,999,999,999.99')) AS "COUNT" from  kl_hard_totals where transaction_date = trunc(sysdate)

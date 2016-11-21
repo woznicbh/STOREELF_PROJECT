@@ -1,0 +1,39 @@
+
+  WITH x
+  AS (SELECT t.loc_nbr ship_node, t.onhand_qty quantity
+  FROM ?.tskst t, ?.xlt_sku x
+  WHERE     x.itm_nbr = t.item_nmbr
+  AND x.sku_nbr = ?
+  AND t.loc_nbr IN (873, 809, 819, 829)),
+  y
+  AS (SELECT d.LOC_NBR ship_node, d.TRN_CLSN_QTY expected
+  FROM ?.xlt_sku x, ?.PCT_TRN_CLSN_BAL d
+  WHERE     x.sku_nbr = ?
+  AND x.INTR_UPC_ID = d.INTR_UPC_ID
+  AND d.loc_nbr IN (873, 809, 819, 829)
+  AND d.TRN_CLSN_CDE = 'SE'),
+  z
+  AS (SELECT t.STR_NBR AS ship_node, SUM(t.ONORD_UNT_QTY) On_Order_QTY
+  FROM ?.XLT_SKU x, ?.TSKSTOO t
+  WHERE     x.SKU_NBR = ? 
+  AND x.ITM_NBR = t.ITM_NBR
+  AND t.STR_NBR IN (873, 809, 819, 829)
+  GROUP BY t.STR_NBR)
+  SELECT CASE x.ship_node
+  WHEN 873 THEN 0
+  WHEN 809 THEN 1
+  WHEN 819 THEN 2
+  WHEN 829 THEN 3
+  END
+  AS NODE,
+  x.ship_node,
+  x.quantity,
+  COALESCE (y.expected, 0) as "Store Expected",
+  COALESCE (z.On_Order_QTY, 0) AS "On Order"
+  FROM x
+  LEFT JOIN y
+  ON x.ship_node = y.ship_node
+  LEFT JOIN z
+  ON y.ship_node = z.ship_node
+  ORDER BY NODE
+  WITH UR

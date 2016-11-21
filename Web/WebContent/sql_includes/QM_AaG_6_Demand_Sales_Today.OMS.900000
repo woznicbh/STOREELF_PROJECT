@@ -1,0 +1,1 @@
+SELECT  /*+ Index_combine( h YFS_ORDER_HEADER_PK YFS_ORDER_HEADER_I6 ) */  trim(TO_CHAR(SUM(h.total_amount), '$999,999,999,999,999,999.99')) AS "COUNT" FROM STERLING.YFS_ORDER_HEADER h WHERE h.ORDER_HEADER_KEY > TO_CHAR((sysdate-20),'YYYYMMDD')AND h.document_type      = '0001'and h.enterprise_key = 'STOREELF.COM'AND h.INVOICE_COMPLETE   = 'N'

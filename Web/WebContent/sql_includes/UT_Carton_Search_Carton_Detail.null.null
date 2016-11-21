@@ -1,0 +1,6 @@
+select cd.carton_nbr, cd.pkt_ctrl_nbr, cd.pkt_seq_nbr, cd.sku_id, cd.to_be_pakd_units as to_be_pakd, cd.units_pakd as pakd, 
+ cd.mod_date_time, cd.user_id, cd.line_item_stat,
+ (select code_desc from sys_code where rec_type = 'S' and code_type = '350' and to_number(code_id) = cd.line_item_stat) as status
+ from carton_dtl cd
+ where cd.carton_nbr = '%s'
+ order by cd.carton_nbr, cd.pkt_seq_nbr

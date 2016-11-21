@@ -1,0 +1,134 @@
+
+ With notDS as (
+ Select Yfs_Order_Header.Order_No,Yfs_Order_Header.CARRIER_SERVICE_CODE,
+ To_Char(Yfs_Order_Header.Order_Date, 'MM/DD/YYYY HH24:MI:SS') Order_Date,
+ Case
+ When yfs_order_line.line_type = ' ' AND (yfs_order_release.shipnode_key > ' ' ) 
+ Then yfs_order_release.shipnode_key 
+ When yfs_order_line.line_type > ' '
+ Then yfs_order_line.line_type
+ When status.description like '%Cancelled%'
+ Then 'Cancelled'
+ When status.description like '%DSV%'
+ Then 'DSV'
+ Else ' ' 
+ END AS shipnode_key,
+ yfs_order_line.prime_line_no,
+ yfs_order_line.item_id,
+ status.description status,
+ yfs_order_release_status.status_quantity,
+ yfs_order_line.gift_flag,
+ CASE
+ WHEN yfs_order_line.extn_wrap_together_group_code = ' '
+ THEN 'N'
+ ELSE 'Y'
+ END AS GIFT_WRAP,
+ CASE
+ WHEN yfs_item.item_type = 'DS'
+ THEN 'Y'
+ ELSE 'N'
+ END AS DS_ITEM,
+ yfs_item.extn_ship_alone,
+ yfs_item.extn_cage_item,
+ yfs_item.extn_is_plastic_gift_card,
+ yfs_item.extn_breakable,
+ yfs_item.allow_gift_wrap,
+ yfs_item.extn_baggage,
+ yfs_item.is_hazmat,
+ (trim(yfs_person_info.address_line1)
+ || trim(yfs_person_info.address_line2)
+ ||', '
+ || trim(yfs_person_info.city)
+ ||', '
+ || trim(yfs_person_info.state)
+ ||', '
+ || trim(yfs_person_info.zip_code)) AS SHIP_TO
+ FROM sterling.yfs_order_header,
+ sterling.yfs_order_line ,
+ sterling.yfs_item,
+ sterling.yfs_order_release,
+ sterling.yfs_person_info,
+ sterling.yfs_order_release_status,
+ sterling.Yfs_Status Status,
+ sterling.yfs_ship_node node
+ WHERE yfs_order_header.order_no               = '?'
+ AND yfs_order_header.document_type            = '0001'
+ AND yfs_order_header.enterprise_key           = 'STOREELF.COM'
+ AND yfs_order_header.order_header_key         = yfs_order_line.order_header_key
+ AND yfs_item.item_id                          = yfs_order_line.item_id
+ AND yfs_order_release.ORDER_RELEASE_KEY (+)   = yfs_order_release_status.order_release_key
+ AND yfs_order_release_status.order_header_key = yfs_order_header.order_header_key
+ AND yfs_order_release_status.ORDER_LINE_KEY   = yfs_order_line.ORDER_LINE_KEY
+ AND yfs_person_info.person_info_key           = yfs_order_line.ship_to_key
+ AND status.status                             = yfs_order_release_status.status
+ And Status.Process_Type_Key                   ='ORDER_FULFILLMENT'
+ And Yfs_Order_Release_Status.Status_Quantity  >0
+ ORDER BY yfs_order_line.prime_line_no
+ ), 
+ DS as(
+ Select Yfs_Order_Header.Order_No,Yfs_Order_Header.CARRIER_SERVICE_CODE,
+ To_Char(Yfs_Order_Header.Order_Date, 'MM/DD/YYYY HH24:MI:SS') Order_Date,
+ Case
+ When yfs_order_line.line_type = ' ' AND (yfs_order_release.shipnode_key > ' ' ) 
+ Then yfs_order_release.shipnode_key 
+ When yfs_order_line.line_type > ' '
+ Then yfs_order_line.line_type 
+ When status.description like '%Cancelled%'
+ Then 'Cancelled'
+ When status.description like '%DSV%'
+ Then 'DSV'
+ Else ' ' 
+ END AS shipnode_key,
+ yfs_order_line.prime_line_no,
+ yfs_order_line.item_id,
+ status.description status,
+ yfs_order_release_status.status_quantity,
+ yfs_order_line.gift_flag,
+ CASE
+ WHEN yfs_order_line.extn_wrap_together_group_code = ' '
+ THEN 'N'
+ ELSE 'Y'
+ END AS GIFT_WRAP,
+ CASE
+ WHEN yfs_item.item_type = 'DS'
+ THEN 'Y'
+ ELSE 'N'
+ END AS DS_ITEM,
+ yfs_item.extn_ship_alone,
+ yfs_item.extn_cage_item,
+ yfs_item.extn_is_plastic_gift_card,
+ yfs_item.extn_breakable,
+ yfs_item.allow_gift_wrap,
+ yfs_item.extn_baggage,
+ yfs_item.is_hazmat,
+ (trim(yfs_person_info.address_line1)
+ || trim(yfs_person_info.address_line2)
+ ||', '
+ || trim(yfs_person_info.city)
+ ||', '
+ || trim(yfs_person_info.state)
+ ||', '
+ || trim(yfs_person_info.zip_code)) AS SHIP_TO
+ FROM sterling.yfs_order_header,
+ sterling.yfs_order_line ,
+ sterling.yfs_item,
+ sterling.yfs_order_release,
+ sterling.yfs_person_info,
+ sterling.yfs_order_release_status,
+ sterling.Yfs_Status Status,
+ sterling.yfs_ship_node node
+ WHERE yfs_order_header.order_no               like '?%'
+ AND yfs_order_header.document_type            = '0005'
+ AND yfs_order_header.enterprise_key           = 'STOREELF.COM'
+ AND yfs_order_header.order_header_key         = yfs_order_line.order_header_key
+ AND yfs_item.item_id                          = yfs_order_line.item_id
+ AND yfs_order_release.ORDER_RELEASE_KEY (+)   = yfs_order_release_status.order_release_key
+ AND yfs_order_release_status.order_header_key = yfs_order_header.order_header_key
+ AND yfs_order_release_status.ORDER_LINE_KEY   = yfs_order_line.ORDER_LINE_KEY
+ AND yfs_person_info.person_info_key           = yfs_order_line.ship_to_key
+ AND status.status                             = yfs_order_release_status.status
+ And Status.Process_Type_Key                   ='PO_FULFILLMENT'
+ And Yfs_Order_Release_Status.Status_Quantity  >0
+ ORDER BY yfs_order_line.prime_line_no)
+ select * from notDS union
+ select * from DS

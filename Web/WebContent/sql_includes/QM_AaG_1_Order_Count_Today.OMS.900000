@@ -1,0 +1,1 @@
+SELECT /*+ parallel(8) full(yfs_order_header) */ trim(TO_CHAR(COUNT(*),'999,999,999,999,999')) AS "COUNT" FROM  yfs_order_header WHERE order_date > TRUNC(sysdate) AND document_type ='0001' AND enterprise_key = 'STOREELF.COM'

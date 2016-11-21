@@ -1,0 +1,5 @@
+select cd.carton_nbr, cd.pkt_ctrl_nbr, cd.pkt_seq_nbr, cd.carton_seq_nbr, cd.sku_id, cd.to_be_pakd_units as to_be_pakd, 
+ cd.units_pakd as pakd, cd.line_item_stat as lstatus, cd.user_id, cd.mod_date_time
+ from carton_dtl cd
+ where cd.pkt_ctrl_nbr = '%s'
+ order by cd.carton_nbr, cd.pkt_seq_nbr

@@ -1,0 +1,23 @@
+WITH reg_dt AS (SELECT COUNT(DISTINCT r.extn_pick_ticket_no) AS COUNT
+  FROM  YFS_ORDER_RELEASE r,
+   Yfs_Order_Header H
+  WHERE h.order_date         > sysdate - 1
+    AND h.order_date           < sysdate
+  AND h.DOCUMENT_TYPE        = '0001'
+  AND r.extn_pick_ticket_no != ' '
+ 	 AND R.Order_Header_Key     = H.Order_Header_Key)
+ , sa_dt AS (SELECT COUNT(DISTINCT ship.pickticket_no) COUNT
+ 		   FROM  Yfs_Order_Release Rel,
+ 			     Yfs_Shipment Ship,
+ 				 Yfs_Shipment_Line Line,
+ 				 yfs_order_header head
+ 			  WHERE rel.Extn_Pick_Ticket_No = ' '
+ 			AND rel.Order_Release_Key     > to_char(sysdate,'YYYYMMDD')
+ 				AND Rel.Document_Type         ='0001'
+ 				AND Line.Order_Release_Key    =Rel.Order_Release_Key
+ 			AND rel.shipnode_key         IN ('873','819','809','829')
+ 				AND line.shipment_key         =ship.shipment_key
+ 			AND head.order_header_key     =rel.order_header_key
+ 				AND head.order_date           > sysdate -1
+ 				AND head.order_date           < sysdate)
+  SELECT trim(TO_CHAR(ROUND((reg.COUNT + sa.COUNT)/24,0),'999,999,999,999,999')) "COUNT" FROM reg_dt reg , sa_dt sa

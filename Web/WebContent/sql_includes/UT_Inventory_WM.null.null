@@ -1,0 +1,5 @@
+select ocd.pkt_ctrl_nbr, ocd.pkt_seq_nbr, ocd.sku_id, sum(ocd.units_pakd)
+ from outpt_carton_dtl ocd
+ where ocd.pkt_ctrl_nbr = '%s'
+ group by ocd.pkt_ctrl_nbr, ocd.pkt_seq_nbr, ocd.sku_id
+ order by ocd.pkt_ctrl_nbr, ocd.pkt_seq_nbr, ocd.sku_id

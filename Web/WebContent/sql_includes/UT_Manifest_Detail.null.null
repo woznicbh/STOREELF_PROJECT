@@ -1,0 +1,6 @@
+select ph.manif_nbr, mpc.carton_nbr, mpc.create_date_time,mpc.user_id, 
+ mpc.stat_code || ' ' || sc.code_desc as status
+ from pkt_hdr ph
+ left join manif_parcl_carton mpc on mpc.pkt_ctrl_nbr = ph.pkt_ctrl_nbr
+ left join sys_code sc on sc.rec_type = 'S' and sc.code_type = '515' and to_number(sc.code_id) = mpc.stat_code 
+ where ph.pkt_ctrl_nbr = '%s'

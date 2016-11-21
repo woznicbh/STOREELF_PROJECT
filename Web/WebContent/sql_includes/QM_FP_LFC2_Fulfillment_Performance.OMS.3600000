@@ -1,0 +1,52 @@
+
+ WITH c1 AS
+  (SELECT COALESCE(min(ROUND(AVG(s.status_date-h.order_date),2)),0) AS average
+  FROM  yfs_order_header h,
+   yfs_order_line l,
+    yfs_shipment_line sl,
+     yfs_shipment s
+ WHERE l.ORDER_HEADER_KEY = h.ORDER_HEADER_KEY
+ AND l.LINE_TYPE         <> 'DSV'
+  AND sl.ORDER_HEADER_KEY  = h.ORDER_HEADER_KEY
+  AND sl.shipment_key      =s.shipment_key
+  AND s.shipnode_key       = '879'
+  AND s.status       >= '1400'
+  AND s.status        < '9000'
+  AND s.status_Date        > TRUNC(sysdate)
+  GROUP BY s.shipnode_key
+  ),
+ c2 AS
+  (SELECT NVL(SUM(l.quantity),0) backlog
+  FROM  yfs_shipment s,
+     yfs_shipment_line l
+  WHERE s.shipnode_key='879'
+  AND s.status        <'1400'
+  AND l.shipment_key  =s.shipment_key
+  ),
+ c4 AS
+  (SELECT NVL(SUM(l.quantity),0) ttlshpunitcnt
+  FROM  yfs_shipment s,
+     yfs_shipment_line l
+  WHERE s.shipnode_key='879'
+  AND s.status       >= '1400'
+  AND s.status        < '9000'
+  AND l.shipment_key  =s.shipment_key
+  AND s.status_date   > TRUNC(sysdate)
+  ),
+ c5 AS
+  (SELECT NVL(SUM(l.original_quantity),0)cnclunitcnt
+  FROM  yfs_shipment s,
+     yfs_shipment_line l
+  WHERE s.shipnode_key='879'
+  AND trim(s.status)  ='9000'
+  AND l.shipment_key  =s.shipment_key
+  AND s.status_date   > TRUNC(sysdate)
+  ),
+ c6 AS ( Select round(c2.backlog/27000,2) expfulfill FROM c2)
+ SELECT average, 
+ trim(TO_CHAR(backlog,'999,999,999,999,999')) as backlog, 
+ 'N/A' pickunitcnt, 
+ trim(TO_CHAR(ttlshpunitcnt,'999,999,999,999,999'))as ttlshpunitcnt, 
+ trim(TO_CHAR(cnclunitcnt,'999,999,999,999,999'))as cnclunitcnt, 
+ expfulfill 
+ FROM c1,c2,c4,c5,c6

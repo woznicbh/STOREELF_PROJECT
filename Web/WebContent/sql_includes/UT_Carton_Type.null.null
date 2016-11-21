@@ -1,0 +1,5 @@
+select ch.carton_nbr, ch.carton_type, ch.carton_size, ct.actl_cntr_vol, ct.max_cntr_vol,
+ ct.max_cntr_wt, ct.len, ct.width, ct.ht
+ from carton_hdr ch, cntr_type ct
+ where (ch.carton_type = ct.cntr_type and ch.carton_size = ct.cntr_size)
+ and ch.pkt_ctrl_nbr = '%s'

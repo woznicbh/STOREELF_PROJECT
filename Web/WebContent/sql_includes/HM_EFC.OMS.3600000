@@ -1,0 +1,55 @@
+WITH Reg_Data AS
+ (SELECT Reg.Region_Name ,
+ Reg.Region_Description ,
+ Reg.Region_Key
+ FROM  Yfs_Region reg
+ WHERE Region_Level_Name='Region'
+ ),
+ Src_Data AS
+ (SELECT region.parent_region_key AS region ,
+   (
+   CASE
+     WHEN upper(trim(node.node_type)) = 'STORE'
+     THEN 'STORE'
+     ELSE DECODE (trim(rel.shipnode_key) , '873', 'EFC 1', '809', 'EFC 2', '819', 'EFC 3', '829', 'EFC 4', '865', 'RDC 865', '810', 'RDC 810', '840', 'RDC 840', '855', 'RDC 855', '830', 'RDC 830', '890', 'RDC 890', '885', 'RDC 885', '875', 'RDC 875', '860','RDC 860','869', 'LFC 869','879','LFC 879','859','LFC 859','889','LFC 889')
+    END)                          AS ship_node ,
+   SUM(stat.status_quantity)     AS quantity ,
+   COUNT(DISTINCT head.order_no) AS orders
+ FROM  Yfs_order_release rel ,
+    Yfs_person_info person ,
+    Yfs_order_release_status stat ,
+    Yfs_order_header head ,
+    Yfs_region region ,
+    Yfs_ship_node node
+ WHERE trim(rel.shipnode_key) <> 'DSV'
+ AND rel.document_type         ='0001'
+ AND stat.order_release_key    = rel.order_release_key
+ AND stat.status              >='1500'
+ AND stat.status_quantity      >0
+ AND Head.Order_Header_Key     = Rel.Order_Header_Key
+ AND head.order_date           > TO_CHAR(SYSDATE, 'DD-Mon-YY')
+ AND head.order_date           < TO_CHAR(SYSDATE+1, 'DD-Mon-YY')
+ AND head.enterprise_key       ='STOREELF.COM'
+ AND head.document_type        ='0001'
+ AND rel.ship_to_key           = person.person_info_key
+ AND region.region_name        = trim(person.state)
+ AND region.region_schema_key  ='ALL_US'
+ AND rel.shipnode_key          =node.shipnode_key
+ GROUP BY region.parent_region_key ,
+   (
+   CASE
+     WHEN upper(trim(node.node_type)) = 'STORE'
+     THEN 'STORE'
+     ELSE DECODE (trim(rel.shipnode_key) , '873', 'EFC 1', '809', 'EFC 2', '819', 'EFC 3', '829', 'EFC 4', '865', 'RDC 865', '810', 'RDC 810', '840', 'RDC 840', '855', 'RDC 855', '830', 'RDC 830', '890', 'RDC 890', '885', 'RDC 885', '875', 'RDC 875', '860','RDC 860','869', 'LFC 869','879','LFC 879','859','LFC 859','889','LFC 889')
+   END)
+ )
+ SELECT DECODE(upper(Reg.Region_Name), 'PLAINS','CENTRAL', 'SOUTH','CENTRAL', 'NORTHEAST','EASTERN', 'NEWENGLAND','EASTERN', 'MIDATLANTIC','EASTERN', 'SOUTHEAST','EASTERN', 'WISCONSIN','EASTERN', 'MIDWEST','EASTERN', 'NORTHWEST','WESTERN', 'MOUNTAIN','WESTERN', 'SOUTHWEST','WESTERN', Reg.Region_Name) AS region ,
+ NVL(Src.Ship_Node,' ') Ship_Node ,
+ SUM(src.quantity) quantity ,
+ SUM(src.orders) orders
+ FROM reg_data reg ,
+ src_data src
+ WHERE Src.Region(+)=Reg.Region_Key
+ GROUP BY DECODE(upper(Reg.Region_Name), 'PLAINS','CENTRAL', 'SOUTH','CENTRAL', 'NORTHEAST','EASTERN', 'NEWENGLAND','EASTERN', 'MIDATLANTIC','EASTERN', 'SOUTHEAST','EASTERN', 'WISCONSIN','EASTERN', 'MIDWEST','EASTERN', 'NORTHWEST','WESTERN', 'MOUNTAIN','WESTERN', 'SOUTHWEST','WESTERN', Reg.Region_Name) ,
+ Src.Ship_Node
+ ORDER BY DECODE(upper(Reg.Region_Name), 'PLAINS','CENTRAL', 'SOUTH','CENTRAL', 'NORTHEAST','EASTERN', 'NEWENGLAND','EASTERN', 'MIDATLANTIC','EASTERN', 'SOUTHEAST','EASTERN', 'WISCONSIN','EASTERN', 'MIDWEST','EASTERN', 'NORTHWEST','WESTERN', 'MOUNTAIN','WESTERN', 'SOUTHWEST','WESTERN', Reg.Region_Name)

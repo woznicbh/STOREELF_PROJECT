@@ -1,0 +1,69 @@
+WITH REGIONS
+ AS (SELECT r.REGION_NAME, r.region_key
+        FROM sterling.YFS_REGION@OMS r
+       WHERE     r.REGION_SCHEMA_KEY = 'ALL_US'
+             AND r.REGION_LEVEL_NAME = 'Region'
+             AND r.region_name <> 'APOFPO'),
+  STATES
+  AS (SELECT TRIM (r2.region_name) AS state,
+             r2.REGION_KEY AS stateid,
+             r.region_key AS regionid
+        FROM regions r, sterling.YFS_REGION@OMS r2
+       WHERE     r2.REGION_SCHEMA_KEY = 'ALL_US'
+             AND r2.region_level_name = 'State'
+             AND r2.PARENT_REGION_KEY = r.region_key
+             AND LENGTH (TRIM (r2.REGION_NAME)) = 2),
+  STORES
+  AS (SELECT /*+ USE_NL(s p) */ TRIM (p.state) AS state,
+             s.SHIPNODE_KEY AS storeid,
+             states.stateid
+        FROM sterling.yfs_ship_node@OMS s,
+             sterling.yfs_person_info@OMS p,
+             STATES states
+       WHERE     s.NODE_TYPE = 'STORE'
+             AND p.PERSON_INFO_KEY = s.SHIP_NODE_ADDRESS_KEY
+             AND states.state = TRIM (p.STATE)),
+  sku_count
+  AS (  SELECT /*+ LEADING(s1) */ st.state,
+               TRIM (
+                  TO_CHAR (COUNT (i.item_id),
+                           '999,999,999,999,999'))
+                  AS "COUNT"
+          FROM GV_ADMIN.yfs_inventory_supply s1,
+               GV_ADMIN.yfs_inventory_item it,
+              GV_ADMIN.YFS_ITEM i,
+              sterling.yfs_ship_node@OMS n,
+                STORES st
+         WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+               AND s1.SHIPNODE_KEY = n.SHIPNODE_KEY
+               AND it.INVENTORY_ITEM_KEY = s1.INVENTORY_ITEM_KEY
+               AND it.ITEM_ID = i.ITEM_ID
+               AND i.extn_dept <> ' '
+               AND i.extn_dept <> '0983'
+               AND i.extn_dept <> '983'
+               AND st.storeid = n.shipnode_key
+      GROUP BY st.state),
+  inv_count
+  AS (  SELECT /*+ LEADING(s i) */ st.state,
+               TRIM (TO_CHAR (SUM (s.quantity), '999,999,999,999,999'))
+                  invtotal
+          FROM GV_ADMIN.yfs_inventory_item i,
+               GV_ADMIN.yfs_inventory_supply s,
+               GV_ADMIN.yfs_item it,
+               sterling.yfs_ship_node@OMS n,
+               STORES st
+         WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+               AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+               AND i.inventory_item_key = s.inventory_item_key
+                AND i.ITEM_ID = it.ITEM_ID
+               AND it.EXTN_DEPT <> ' '
+              AND it.extn_dept <> '0983'
+              AND it.EXTN_DEPT <> '983'
+              AND st.storeid = n.shipnode_key
+      GROUP BY st.state)
+ SELECT STATES.state, NVL (COUNT, 0) COUNT, NVL (invtotal, 0) invtotal
+   FROM STATES
+        LEFT OUTER JOIN sku_count
+           ON STATES.state = sku_count.state
+        LEFT OUTER JOIN inv_count
+           ON STATES.state = inv_count.state

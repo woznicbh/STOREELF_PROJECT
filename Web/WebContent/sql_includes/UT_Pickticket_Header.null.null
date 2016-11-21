@@ -1,0 +1,6 @@
+select ph.pkt_ctrl_nbr, ph.whse, ph.cust_po_nbr as ecomm_ord, ph.ord_type as type, ph.prty_code, ph.ord_date, ph.shipto_name, 
+ phi.total_nbr_of_units as total_units, phi.stat_code || ' ' || sc.code_desc as status
+ from pkt_hdr ph
+ left join pkt_hdr_intrnl phi on phi.pkt_ctrl_nbr = ph.pkt_ctrl_nbr
+ left join sys_code sc on sc.rec_type = 'S' and sc.code_type = '501' and to_number(sc.code_id) = phi.stat_code
+ where ph.pkt_ctrl_nbr = '%s'

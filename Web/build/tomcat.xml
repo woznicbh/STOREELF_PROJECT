@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." name="server">
+	<property file="tomcat.properties" />
+	<property name="CATALINA_HOME" value="${server.home}" />
+	<taskdef file="tomcatTasks.properties">
+		<classpath>
+			<pathelement path="${server.lib}/catalina-ant.jar" />
+		</classpath>
+	</taskdef>
+	<target name="install" description="Install application in Tomcat">
+		<deploy url="${tomcat.manager.url}" username="${tomcat.username}"
+			password="${tomcat.password}" path="/${webapp.name}"
+			war="file:${webapp.dist}/${webapp.war}" />
+	</target>
+
+	<target name="remove" description="Remove application in Tomcat">
+		<undeploy url="${tomcat.manager.url}" username="${tomcat.username}"
+			password="${tomcat.password}" path="/${webapp.name}" />
+	</target>
+
+	<target name="reload" description="Reload application in Tomcat">
+		<reload url="${tomcat.manager.url}" username="${tomcat.username}"
+			password="${tomcat.password}" path="/${webapp.name}" />
+	</target>
+
+	<target name="start" description="Start Tomcat application">
+		<start url="${tomcat.manager.url}" username="${tomcat.username}"
+			password="${tomcat.password}" path="/${webapp.name}" />
+	</target>
+
+	<target name="stop" description="Stop Tomcat application">
+		<stop url="${tomcat.manager.url}" username="${tomcat.username}"
+			password="${tomcat.password}" path="/${webapp.name}" />
+	</target>
+
+	<target name="list" description="List Tomcat applications">
+		<list url="${tomcat.manager.url}" username="${tomcat.username}"
+			password="${tomcat.password}" />
+	</target>
+	
+	<target name="tomcat-start">
+	  <java jar="${server.home}/bin/bootstrap.jar" fork="true">
+		  <jvmarg value="-Dcatalina.home=${server.home}"/>
+	  </java>
+	</target>
+
+	<target name="tomcat-stop">
+	  <java jar="${server.home}/bin/bootstrap.jar" fork="true">
+		  <jvmarg value="-Dcatalina.home=${server.home}"/>
+		  <arg line="stop"/>
+	  </java>
+	</target>
+</project>

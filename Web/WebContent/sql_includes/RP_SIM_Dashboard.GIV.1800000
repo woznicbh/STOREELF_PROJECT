@@ -1,0 +1,105 @@
+with supplyrdc AS 
+ (Select s.INVENTORY_ITEM_KEY,ii.item_id,s.SHIPNODE_KEY,s.QUANTITY from
+ sterling.yfs_inventory_supply s,sterling.yfs_inventory_item ii
+ where exists (select 'x' from sterling.yfs_ship_node sn
+ where sn.NODE_TYPE  = 'RDC'
+ and sn.shipnode_key = s.SHIPNODE_KEY)
+ and ii.INVENTORY_ITEM_KEY = s.INVENTORY_ITEM_KEY
+ ), 
+ demandrdc AS 
+ (SELECT ii.inventory_item_key,ii.item_id,
+ yd.shipnode_key,
+ SUM(yd.quantity) as quantity
+ FROM sterling.yfs_inventory_demand yd,supplyrdc ii
+ WHERE ii.inventory_item_key = yd.inventory_item_key
+ AND yd.demand_type ='ALLOCATED'
+ and yd.SHIPNODE_KEY = ii.shipnode_key
+ GROUP BY ii.inventory_item_key,ii.item_id,
+ yd.shipnode_key
+ ), 
+ RDCINV as 
+ (SELECT s.item_id,
+ i.short_description,
+ i.item_type,
+ i.product_line,
+ i.extn_direct_ship_item as extn_direct_ship_item,
+ i.extn_ship_alone,
+ i.extn_cage_item,
+ i.extn_is_plastic_gift_card,
+ i.extn_breakable as extn_breakable,
+ i.allow_gift_wrap,
+ i.extn_baggage,
+ CASE WHEN (trim(s.shipnode_key) IN ('869','879','889','859')) THEN 'LFC' ELSE i.extn_ship_node_source END AS extn_ship_node_source, 
+ i.extn_red_pack_list_type,
+ i.extn_nomadic,  
+ s.shipnode_key,
+ s.quantity as Supply,
+ nvl(d.quantity,0) as DemandQty,
+ Coalesce(s.quantity,0) - Coalesce(d.quantity,0) AS Available
+ FROM supplyrdc s, demandrdc d,sterling.yfs_item i
+ WHERE d.shipnode_key (+)= s.shipnode_key
+ AND d.inventory_item_key (+)= s.inventory_item_key
+ and s.item_id = i.ITEM_ID ),
+ supplyred AS 
+ (SELECT i.item_id,
+ i.short_description,
+ i.item_type,
+ i.product_line,
+ i.extn_direct_ship_item as extn_direct_ship_item,
+ i.extn_ship_alone,
+ i.extn_cage_item,
+ i.extn_is_plastic_gift_card,
+ i.extn_breakable as extn_breakable,
+ i.allow_gift_wrap,
+ i.extn_baggage,
+ CASE WHEN (trim(s.shipnode_key) IN ('869','879','889','859')) THEN 'LFC' ELSE i.extn_ship_node_source END AS extn_ship_node_source, 
+ i.extn_red_pack_list_type,
+ i.extn_nomadic, 
+ ' ' as node_type,
+ it.inventory_item_key,
+ s.SHIPNODE_KEY,
+ s.QUANTITY
+ FROM  sterling.yfs_item i,
+ sterling.yfs_inventory_item it,
+ sterling.yfs_inventory_supply s
+ WHERE  i.extn_red_pack_list_type   > ' '  
+ AND i.item_id = it.item_id
+ AND it.INVENTORY_ITEM_KEY = s.INVENTORY_ITEM_KEY
+ ),
+ demandred AS 
+ (SELECT ii.inventory_item_key,ii.item_id,
+ yd.shipnode_key,
+ SUM(yd.quantity) as quantity
+ FROM sterling.yfs_inventory_demand yd,supplyred ii
+ WHERE ii.inventory_item_key = yd.inventory_item_key
+ AND yd.demand_type ='ALLOCATED'
+ and yd.SHIPNODE_KEY = ii.shipnode_key
+ GROUP BY ii.inventory_item_key,ii.item_id,
+ yd.shipnode_key
+ ), 
+ REDINV as 
+ (SELECT s.item_id,
+ s.short_description,
+ s.item_type,
+ s.product_line,
+ s.extn_direct_ship_item as extn_direct_ship_item,
+ s.extn_ship_alone,
+ s.extn_cage_item,
+ s.extn_is_plastic_gift_card,
+ s.extn_breakable as extn_breakable,
+ s.allow_gift_wrap,
+ s.extn_baggage,
+ CASE WHEN (trim(s.shipnode_key) IN ('869','879','889','859')) THEN 'LFC' ELSE s.extn_ship_node_source END AS extn_ship_node_source, 
+ s.extn_red_pack_list_type,
+ s.extn_nomadic,  
+ s.shipnode_key,
+ s.quantity as Supply,
+ nvl(d.quantity,0) as DemandQty,
+ Coalesce(s.quantity,0) - Coalesce(d.quantity,0) AS Available
+ FROM supplyred s, demandred d
+ WHERE d.shipnode_key (+)= s.shipnode_key
+ AND d.inventory_item_key (+)= s.inventory_item_key
+ )
+ SELECT * FROM RDCINV
+ UNION
+ SELECT * FROM REDINV

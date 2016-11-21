@@ -1,0 +1,3 @@
+select ship_via, ship_via_desc, carr_id, serv_type, label_type, create_date_time, mod_date_time, user_id
+ from ship_via
+ where ship_via = '?'

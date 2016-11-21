@@ -1,0 +1,36 @@
+WITH sku_count
+ AS (SELECT /*+ INDEX_JOIN(s1 EXTN_INVENTORY_SUPPLY_I3) INDEX_JOIN(it yfs_inventory_item_pk) INDEX_JOIN(i yfs_pk) INDEX_JOIN(n YFS_SHIP_NODE_PK)   */  TRIM (
+              TO_CHAR (COUNT (i.item_id),
+                       '999,999,999,999,999'))
+              AS "COUNT"
+      FROM GV_ADMIN.yfs_inventory_supply s1,
+            GV_ADMIN.yfs_inventory_item it,
+           GV_ADMIN.YFS_ITEM i,
+          sterling.yfs_ship_node@OMS n
+     WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+          AND s1.SHIPNODE_KEY = n.SHIPNODE_KEY
+           AND it.INVENTORY_ITEM_KEY = s1.INVENTORY_ITEM_KEY
+           AND it.ITEM_ID = i.ITEM_ID
+            AND i.extn_dept <> ' '
+            AND i.extn_dept <> '0983'
+             AND i.extn_dept <> '983'
+             AND s1.SHIPNODE_KEY in (SELECT n.shipnode_key 
+             FROM sterling.yfs_ship_node@OMS n
+             WHERE     UPPER (n.node_type) = 'STORE'
+             AND SHIPPING_CALENDAR_KEY != '                        ')),
+   inv_count
+  AS (SELECT /*+ INDEX_JOIN(it yfs_inventory_item_pk) INDEX_JOIN(i yfs_pk) INDEX_JOIN(n YFS_SHIP_NODE_PK) INDEX_JOIN(s1 EXTN_INVENTORY_SUPPLY_I3)   */   TRIM (TO_CHAR (SUM (s.quantity), '999,999,999,999,999'))
+               invtotal
+       FROM GV_ADMIN.yfs_inventory_item i,
+            GV_ADMIN.yfs_inventory_supply s,
+            GV_ADMIN.yfs_item it,
+            sterling.yfs_ship_node@OMS n
+       WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+            AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+            AND i.inventory_item_key = s.inventory_item_key
+           AND i.ITEM_ID = it.ITEM_ID
+           AND it.EXTN_DEPT <> ' '
+          AND it.extn_dept <> '0983'
+         AND it.EXTN_DEPT <> '983')
+ SELECT NVL (COUNT, 0) COUNT, NVL (invtotal, 0) invtotal
+  FROM sku_count, inv_count

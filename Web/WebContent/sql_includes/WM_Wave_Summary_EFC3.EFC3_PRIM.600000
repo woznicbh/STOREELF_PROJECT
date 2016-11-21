@@ -1,0 +1,23 @@
+select a.wave_nbr, a.wave_desc, a.max_pkts, a.max_units, to_char(a.wave_start_time, 'MM/DD HH24":"MI":"SS') as wave_start_time,
+ to_char(a.wave_end_time, 'MM/DD HH24":"MI":"SS') as wave_end_time, b.total_pkt, b.total_units,
+ to_char(trunc(sysdate) + (a.wave_end_time-a.wave_start_time), 'HH24":"MI":"SS') as TOTAL_WAVE_TIME
+ from
+ (
+ select ref_value_1 as wave_nbr, wp.wave_desc as wave_desc, wp.max_units as max_units, wp.max_pkts as max_pkts, 
+ log_date_time as wave_start_time,
+ (select log_date_time from msg_log where module = 'WAVE' and msg_id = '2018' and ref_value_1 = ml.ref_value_1) as wave_end_time
+ from msg_log ml, wave_parm wp
+ where ml.ref_value_1 = wp.wave_nbr
+ and module = 'WAVE'
+ and msg_id = '2003'
+ and wp.create_date_time > sysdate - 1
+ ) a,
+ (
+ select phi.pick_wave_nbr, count(pkt_ctrl_nbr) as total_pkt, sum(phi.total_nbr_of_units) as total_units
+ from pkt_hdr_intrnl phi, wave_parm wp
+ where phi.pick_wave_nbr = wp.wave_nbr
+ and wp.create_date_time > sysdate - 1
+ group by phi.pick_wave_nbr 
+ ) b
+ where a.wave_nbr = b.pick_wave_nbr
+ order by a.wave_start_time DESC

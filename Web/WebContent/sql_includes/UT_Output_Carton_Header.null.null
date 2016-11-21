@@ -1,0 +1,6 @@
+select och.invc_batch_nbr, och.pkt_ctrl_nbr, och.carton_nbr, och.create_date_time, och.mod_date_time, och.proc_date_time, 
+ och.proc_stat_code || ' ' || sc.code_desc as status
+ from outpt_carton_hdr och
+ left join sys_code sc on sc.rec_type = 'S' and sc.code_type = '502' and to_number(sc.code_id) = och.proc_stat_code
+ where och.pkt_ctrl_nbr = '%s'
+ order by och.invc_batch_nbr, och.carton_nbr

@@ -1,0 +1,5 @@
+select oph.pkt_ctrl_nbr, oph.cust_po_nbr as ecomm_ord, oph.invc_batch_nbr, oph.create_date_time, oph.mod_date_time, oph.proc_date_time,
+ oph.proc_stat_code || ' ' || sc.code_desc as status
+ from outpt_pkt_hdr oph
+ left join sys_code sc on sc.rec_type = 'S' and sc.code_type = '502' and to_number(sc.code_id) = oph.proc_stat_code 
+ where oph.pkt_ctrl_nbr = '%s'

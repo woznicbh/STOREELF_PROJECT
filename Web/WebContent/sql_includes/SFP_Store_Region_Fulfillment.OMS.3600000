@@ -1,0 +1,111 @@
+
+ WITH REGIONS
+ AS (SELECT TRIM (r.REGION_NAME) AS region, r.region_key
+ FROM sterling.yfs_REGION r
+ WHERE     r.REGION_SCHEMA_KEY = 'ALL_US'
+ AND r.REGION_LEVEL_NAME = 'Region'
+ AND r.region_name <> 'APOFPO'),
+ STATES
+ AS (SELECT TRIM (r2.region_name) AS state,
+ r2.REGION_KEY AS stateid,
+ r.region_key AS regionid
+ FROM regions r, sterling.yfs_region r2
+ WHERE     r2.REGION_SCHEMA_KEY = 'ALL_US'
+ AND r2.region_level_name = 'State'
+ AND r2.PARENT_REGION_KEY = r.region_key
+ AND LENGTH (TRIM (r2.REGION_NAME)) = 2),
+ STORES
+ AS (SELECT TRIM (p.state) AS state,
+ s.SHIPNODE_KEY AS storeid,
+ states.stateid
+ FROM sterling.yfs_ship_node s,
+ sterling.yfs_person_info p,
+ STATES states
+ WHERE     s.NODE_TYPE = 'STORE'
+ AND p.PERSON_INFO_KEY = s.SHIP_NODE_ADDRESS_KEY
+ AND states.state = TRIM (p.STATE)),
+ c1
+ AS (SELECT                    /*+ parallel(8) full(h) full(sl) full(s) */
+ sa.regionid,
+ ROUND (AVG (s.status_date - h.order_date), 2) AS average
+ FROM sterling.yfs_order_header h,
+ sterling.yfs_shipment_line sl,
+ sterling.yfs_shipment s,
+ sterling.yfs_ship_node n,
+ STORES st,
+ STATES sa
+ WHERE     sl.ORDER_HEADER_KEY = h.ORDER_HEADER_KEY
+ AND sl.shipment_key = s.shipment_key
+ AND UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND s.status >= '1400'
+ AND s.status < '9000'
+ AND s.status_Date > trunc(sysdate)
+ AND st.storeid = n.shipnode_key
+ AND st.state = sa.state
+ GROUP BY sa.regionid),
+ c2
+ AS (SELECT                            /*+ parallel(8) full(s) full (l) */
+ sa.regionid, NVL (SUM (l.quantity), 0) backlog
+ FROM sterling.yfs_shipment s,
+ sterling.yfs_shipment_line l,
+ sterling.yfs_ship_node n,
+ STORES st,
+ STATES sa
+ WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND s.status < '1400'
+ AND l.shipment_key = s.shipment_key
+ AND st.storeid = n.shipnode_key
+ AND st.state = sa.state
+ GROUP BY sa.regionid),
+ c4
+ AS (SELECT                             /*+ parallel(8) full(s) full(l) */
+ sa.regionid, NVL (SUM (l.quantity), 0) ttlshpunitcnt
+ FROM sterling.yfs_shipment s,
+ sterling.yfs_shipment_line l,
+ sterling.yfs_ship_node n,
+ STORES st,
+ STATES sa
+ WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND s.status >= '1400'
+ AND s.status < '9000'
+ AND l.shipment_key = s.shipment_key
+ AND s.status_date > TRUNC (SYSDATE)
+ AND st.storeid = n.shipnode_key
+ AND st.state = sa.state
+ GROUP BY sa.regionid),
+ c5
+ AS (SELECT                             /*+ parallel(8) full(s) full(l) */
+ sa.regionid, NVL (SUM (l.original_quantity), 0) cnclunitcnt
+ FROM sterling.yfs_shipment s,
+ sterling.yfs_shipment_line l,
+ sterling.yfs_ship_node n,
+ STORES st,
+ STATES sa
+ WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND TRIM (s.status) = '9000'
+ AND l.shipment_key = s.shipment_key
+ AND s.status_date > TRUNC (SYSDATE)
+ AND st.storeid = n.shipnode_key
+ AND st.state = sa.state
+ GROUP BY sa.regionid)
+ SELECT REGIONS.region,
+ NVL (average, 0) AS average,
+ TRIM (TO_CHAR (NVL (backlog, 0), '999,999,999,999,999')) AS backlog,
+ 'N/A' pickunitcnt,
+ TRIM (TO_CHAR (NVL (ttlshpunitcnt, 0), '999,999,999,999,999'))
+ AS ttlshpunitcnt,
+ TRIM (TO_CHAR (NVL (cnclunitcnt, 0), '999,999,999,999,999'))
+ AS cnclunitcnt
+ FROM REGIONS
+ LEFT OUTER JOIN c1
+ ON REGIONS.region_key = c1.regionid
+ LEFT OUTER JOIN c2
+ ON REGIONS.region_key = c2.regionid
+ LEFT OUTER JOIN c4
+ ON REGIONS.region_key = c4.regionid
+ LEFT OUTER JOIN c5
+ ON REGIONS.region_key = c5.regionid

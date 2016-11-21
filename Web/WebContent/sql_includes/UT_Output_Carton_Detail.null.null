@@ -1,0 +1,5 @@
+select ocd.invc_batch_nbr, ocd.carton_nbr, ocd.carton_seq_nbr, ocd.pkt_ctrl_nbr, ocd.pkt_seq_nbr, ocd.sku_id, 
+ ocd.units_pakd, ocd.mod_date_time
+ from outpt_carton_dtl ocd
+ where ocd.pkt_ctrl_nbr = '%s'
+ order by ocd.invc_batch_nbr, ocd.carton_nbr, ocd.carton_seq_nbr

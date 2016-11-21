@@ -1,0 +1,39 @@
+STOREELF EXPANSION TUTORIAL
+
+Below are the simple steps required to expand LobHub’s existing architecture.
+1)	Creating a new Section
+	o	Adding Section ROOT
+			Create a new directory with the name of your Section in all lowercase alphanumeric characters font followed by underscore and ‘includes’ 
+			•	Example: “reports_includes”, “utility_includes”, …etc.
+	o	Creating Section Default Page
+			You will need to also create a default page in that directory with the name of your component in all lowercase alphanumeric characters, DO NOT USE CAMELCASE
+			•	Example: “report.jsp” copy the content from the ‘example_includes/example.jsp’
+	o	Creating Sidebar
+			You will need to also create a sidebar jsp file in that directory with the name of your component followed by ‘_sidebar.jsp ’ in all lowercase alphanumeric characters, DO NOT USE CAMELCASE
+			•	Example: “report_sidebar.jsp” copy the content from the ‘example_includes/example_sidebar.jsp’ and adjust to include your logic
+	o	Creating Component
+			Create folder with the component’s name in all lowercase alphanumeric characters, replacing spaces with underscores. DO NOT USE CAMELCASE
+			•	Example: ‘order_management’, ‘sourcing_detail’, …etc.
+	o	Creating Modules
+			Create JSP file within the newly created component directory with the name in all lowercase alphanumeric characters, replacing the spaces with underscores. DO NOT USE CAMELCASE
+			•	Example: ‘item.jsp’, ‘order.jsp’, ‘example_module.jsp’ …etc
+
+--------------------------------------------------------------------------------------------------------------
+
+2)	Modifying an existing Component
+	o	Modifying Section ROOT
+			Create a new directory with the name of your Section in all lowercase alphanumeric characters font followed by underscore and ‘includes’ 
+			•	Example: “reports_includes”, “utility_includes”, …etc.
+	o	Modifying Section Default Page
+			You will need to also create a default page in that directory with the name of your component in all lowercase alphanumeric characters, DO NOT USE CAMELCASE
+			•	Example: “report.jsp” copy the content from the ‘example_includes/example.jsp’
+	o	Modifying Sidebar
+			You will need to also create a sidebar jsp file in that directory with the name of your component followed by ‘_sidebar.jsp ’ in all lowercase alphanumeric characters, DO NOT USE CAMELCASE
+			•	Example: “report_sidebar.jsp” copy the content from the ‘example_includes/example_sidebar.jsp’ and adjust to include your logic
+	o	Modifying Component
+			Create folder with the component’s name in all lowercase alphanumeric characters, replacing spaces with underscores. DO NOT USE CAMELCASE
+			•	Example: ‘order_management’, ‘sourcing_detail’, …etc.
+	o	Modifying Modules
+			Create JSP file within the newly created component directory with the name in all lowercase alphanumeric characters, replacing the spaces with underscores. DO NOT USE CAMELCASE
+			•	Example: ‘item.jsp’, ‘order.jsp’, ‘example_module.jsp’ …etc
+	

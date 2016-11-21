@@ -1,0 +1,20 @@
+
+SELECT yfs_item.item_id,
+  yfs_item.SHORT_DESCRIPTION,
+  yfs_item.extn_direct_ship_item,
+  yfs_item.extn_ship_alone,
+  yfs_item.extn_cage_item,
+  yfs_item.extn_is_plastic_gift_card,
+  Yfs_Item.Extn_Breakable,
+  Yfs_Item.Allow_Gift_Wrap,
+  Yfs_Item.Extn_Baggage,
+  yfs_item.is_hazmat,
+  yfs_item.item_type,
+  yfs_item.product_line,
+  yfs_item.extn_red_pack_list_type,
+  yfs_item.extn_ship_node_source,
+  yfs_item.extn_nomadic,
+  yfs_item.onhand_safety_factor_qty,
+  yfs_item.onhand_safety_factor_pct
+FROM Sterling.Yfs_Item
+WHERE yfs_item.item_id in ( ? )

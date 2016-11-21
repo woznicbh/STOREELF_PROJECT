@@ -1,0 +1,3 @@
+select opd.pkt_seq_nbr, opd.sku_id, opd.orig_pkt_qty, opd.pkt_qty, opd.cancel_qty, opd.shpd_qty, opd.create_date_time
+ from outpt_pkt_dtl opd
+ where opd.pkt_ctrl_nbr = '%s'

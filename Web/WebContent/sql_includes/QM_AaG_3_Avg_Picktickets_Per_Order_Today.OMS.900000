@@ -1,0 +1,1 @@
+SELECT /*+ parallel(8) full(r) full(h) */ ROUND(COUNT(r.ORDER_HEADER_KEY)/COUNT(DISTINCT h.ORDER_NO),2) AS "COUNT" FROM  YFS_ORDER_RELEASE r,   yfs_order_header h WHERE h.order_date > TRUNC(sysdate) AND h.order_date < TRUNC(sysdate +1) AND h.DOCUMENT_TYPE = '0001' AND r.extn_pick_ticket_no != ' ' AND r.ORDER_HEADER_KEY = h.order_header_key GROUP BY TRUNC(h.createts)

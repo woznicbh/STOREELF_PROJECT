@@ -1,0 +1,7 @@
+ select /*+ parallel(8) full(line) full(ors) full(head) full(it)*/ TRIM(TO_CHAR(sum(ors.status_quantity),'999,999,999,999,999')) "COUNT"				
+ from sterling.yfs_order_line line, sterling.yfs_order_release_status ors,sterling.yfs_order_header head 
+ , sterling.yfs_item it where ors.order_release_status_key > TO_CHAR(SYSDATE - 1,'YYYYMMDD')   
+ and ors.order_release_status_key < TO_CHAR(SYSDATE,'YYYYMMDD') and                            
+ ors.status_quantity > 0 and ors.status = '9000'                                               
+ and head.document_type = '0001' and head.order_header_key  = line.order_header_key 
+ and line.order_line_key = ors.order_line_key and it.item_id = line.item_id                   

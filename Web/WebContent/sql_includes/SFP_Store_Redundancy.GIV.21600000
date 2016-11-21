@@ -1,0 +1,45 @@
+WITH Each_Store
+  AS (SELECT description, n.shipnode_key AS store_num
+ 	           FROM sterling.yfs_ship_node@OMS n
+ 	          WHERE     UPPER (n.node_type) = 'STORE'
+ 	                AND SHIPPING_CALENDAR_KEY != '                        '),
+ 	     UNIQUE_SKU_COUNT
+ 	     AS (  SELECT /*+ LEADING(s1) */ n.SHIPNODE_KEY, COUNT (DISTINCT i.item_id) uniquecount
+ 	             FROM GV_ADMIN.yfs_inventory_supply s1,
+ 	                  GV_ADMIN.yfs_inventory_item it,
+ 	                  GV_ADMIN.YFS_ITEM i,
+ 	                  sterling.yfs_ship_node@OMS n
+ 	            WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ 	                  AND s1.SHIPNODE_KEY = n.SHIPNODE_KEY
+ 	                  AND it.INVENTORY_ITEM_KEY = s1.INVENTORY_ITEM_KEY
+ 	                  AND it.ITEM_ID = i.ITEM_ID
+ 	                  AND i.extn_dept <> ' '
+ 	                  AND i.extn_dept <> '0983'
+ 	                  AND i.extn_dept <> '983'
+ 	                  AND NOT EXISTS
+ 	                             (SELECT 'x'
+ 	                                FROM GV_ADMIN.yfs_inventory_supply s2
+ 	                               WHERE     s2.INVENTORY_ITEM_KEY =
+ 	                                            s1.INVENTORY_ITEM_KEY
+ 	                                     AND s2.SHIPNODE_KEY IN
+ 	                                            ('873', '809', '819', '829','810','830','840','855','860','865','875','885','890'))
+ 	         GROUP BY n.SHIPNODE_KEY),
+ 	     TOTAL_SKU_COUNT
+ 	     AS (  SELECT /*+ LEADING(s) */ n.SHIPNODE_KEY,
+ 	                  COUNT ((s.INVENTORY_ITEM_KEY)) AS totalcount
+ 	             FROM GV_ADMIN.YFS_INVENTORY_SUPPLY s, sterling.yfs_ship_node@OMS n
+ 	            WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ 	                  AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ 	         GROUP BY n.SHIPNODE_KEY)
+ 	SELECT Each_Store.description || ' - ' || TRIM (Each_Store.store_num)
+ 	          AS store_name,
+ 	       TRIM (TO_CHAR (uniquecount, '999,999,999,999,999')) AS UniqueCount,
+ 	       DECODE (totalcount,
+ 	               0, '0',
+ 	               ROUND ( (uniquecount / totalcount) * 100, 0))
+ 	          AS TotalCount
+ 	  FROM Each_Store
+ 	       LEFT OUTER JOIN UNIQUE_SKU_COUNT
+ 	          ON Each_Store.store_num = UNIQUE_SKU_COUNT.SHIPNODE_KEY
+ 	       LEFT OUTER JOIN TOTAL_SKU_COUNT
+ 	          ON Each_Store.store_num = TOTAL_SKU_COUNT.SHIPNODE_KEY

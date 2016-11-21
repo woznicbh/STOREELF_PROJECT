@@ -1,0 +1,42 @@
+
+WITH c1 AS
+  (SELECT ROUND(AVG(o.create_date_time - o.ORD_DATE), 2) AS average
+  FROM wmos_efc.outpt_pkt_hdr o
+  WHERE o.CREATE_DATE_TIME > TRUNC(sysdate)
+  AND o.pkt_ctrl_nbr like '0%'
+  ),
+  c2 AS
+  (SELECT SUM(d.ORIG_ORD_QTY) backlog
+  FROM wmos_efc.pkt_hdr_intrnl i,
+    wmos_efc.pkt_dtl d
+  WHERE i.STAT_CODE < 90
+  AND i.PKT_CTRL_NBR LIKE '0%'
+  AND i.PKT_CTRL_NBR = d.PKT_CTRL_NBR
+  AND i.stat_code = '10'
+  ),
+  c3 AS
+  (SELECT SUM(ptt.nbr_units) pickunitcnt
+  FROM wmos_efc.prod_trkg_tran ptt
+  WHERE ptt.MOD_DATE_TIME >= TRUNC(sysdate) - 1
+  AND ptt.MOD_DATE_TIME   <= TRUNC(sysdate) + 6/24
+  AND menu_optn_name                       IN ('Pack Ship Alone','Pick Gift Card','Pick to Carton','Pick to Tote','Trbl Pick to Carton','Pick to Carton WA')
+  AND tran_type            ='500'
+  AND tran_code           IN ('001','007','010')
+  ),
+  c4 AS
+  (SELECT COALESCE(SUM( ocd.units_pakd ),0) ttlshpunitcnt
+  FROM wmos_efc.outpt_carton_dtl ocd
+  WHERE ocd.create_date_time >= TRUNC(sysdate) + 6/24
+  ),
+  c5 AS
+ (SELECT COALESCE( sum(opd.orig_pkt_qty - opd.shpd_qty),0) cnclunitcnt 
+ FROM outpt_pkt_dtl opd, outpt_pkt_hdr oph WHERE oph.pkt_ctrl_nbr = opd.pkt_ctrl_nbr AND opd.orig_pkt_qty - opd.shpd_qty > 0 
+ AND oph.mod_date_time >= TRUNC(sysdate) + 6/24 AND opd.proc_stat_code = 90  and
+ (oph.pkt_ctrl_nbr not like 'X%' and oph.pkt_ctrl_nbr not like 'C%' and oph.pkt_ctrl_nbr not like 'T%')  
+  ),
+ c6 AS  ( SELECT ROUND(c2.backlog/(select COALESCE(ROUND(sum(shpd_qty)/3),100000) from
+ wmos_efc.outpt_pkt_dtl p
+ where trunc(p.CREATE_DATE_TIME) >= trunc(sysdate-3)
+ and trunc(p.create_date_time) < trunc(sysdate)),2) expfulfill FROM c2
+ )
+ SELECT average,trim(TO_CHAR(backlog,'999,999,999,999,999')) as backlog,trim(TO_CHAR(pickunitcnt,'999,999,999,999,999')) as pickunitcnt,trim(TO_CHAR(ttlshpunitcnt,'999,999,999,999,999'))as ttlshpunitcnt,trim(TO_CHAR(cnclunitcnt,'999,999,999,999,999'))as cnclunitcnt,expfulfill FROM c1,c2,c3,c4,c5,c6

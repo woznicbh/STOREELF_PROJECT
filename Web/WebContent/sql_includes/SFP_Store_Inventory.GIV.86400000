@@ -1,0 +1,48 @@
+WITH Each_Store
+  AS (SELECT description, n.shipnode_key AS store_num
+            FROM sterling.yfs_ship_node@OMS n
+          WHERE     UPPER (n.node_type) = 'STORE'
+                 AND SHIPPING_CALENDAR_KEY != '                        '),
+     sku_count
+     AS (  SELECT /*+ PARALLEL */ n.shipnode_key,
+                   TRIM (
+                      TO_CHAR (COUNT (i.item_id),
+                               '999,999,999,999,999'))
+                      AS "COUNT"
+              FROM GV_ADMIN.yfs_inventory_supply s1,
+                   GV_ADMIN.yfs_inventory_item it,
+                   GV_ADMIN.YFS_ITEM i,
+                   sterling.yfs_ship_node@OMS n
+             WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+                   AND s1.SHIPNODE_KEY = n.SHIPNODE_KEY
+                   AND it.INVENTORY_ITEM_KEY = s1.INVENTORY_ITEM_KEY
+                   AND it.ITEM_ID = i.ITEM_ID
+                   AND i.extn_dept <> ' '
+                   AND i.extn_dept <> '0983'
+                   AND i.extn_dept <> '983'
+          GROUP BY n.shipnode_key),
+      inv_count
+      AS (  SELECT /*+ PARALLEL */  n.shipnode_key,
+                   TRIM (TO_CHAR (SUM (s.quantity), '999,999,999,999,999'))
+                      invtotal
+              FROM GV_ADMIN.yfs_inventory_item i,
+                   GV_ADMIN.yfs_inventory_supply s,
+                   GV_ADMIN.yfs_item it,
+                   sterling.yfs_ship_node@OMS n
+             WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+                   AND i.ITEM_ID = it.ITEM_ID
+                   AND s.inventory_item_key = i.inventory_item_key
+                   AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+                   AND it.EXTN_DEPT <> ' '
+                   AND it.extn_dept <> '0983'
+                   AND it.EXTN_DEPT <> '983'
+          GROUP BY n.shipnode_key)
+ SELECT Each_Store.description || ' - ' || TRIM (Each_Store.store_num)
+           AS store_name,
+        NVL (COUNT, 0) COUNT,
+        NVL (invtotal, 0) invtotal
+   FROM Each_Store
+        LEFT OUTER JOIN sku_count
+           ON Each_Store.store_num = sku_count.shipnode_key
+        LEFT OUTER JOIN inv_count
+           ON Each_Store.store_num = inv_count.shipnode_key

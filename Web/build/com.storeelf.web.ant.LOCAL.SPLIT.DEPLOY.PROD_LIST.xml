@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build-sections" name="com_storeelf_report_web">
+	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+	<property file="build/com.storeelf.web.ant.properties" />
+	<property name="build.lib" value="WebContent/WEB-INF/lib" />
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="content.dir" value="WebContent" />
+	<property name="instance.dir" value="instance" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	
+	<property name="server_list" value="k2ms2055" />
+	
+	<property name="build.OneSectionOnly" value="true" />  
+	<property name="build.section" value="dashboard" />   
+	<property name="build.deploy" value="true" />
+ 
+
+	<!-- SDK and classpath info -->
+	<path id="ape.classpath">
+		 <fileset dir="${content.dir}//WEB-INF/lib">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${build.lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+<!--
+	<target name="precleanbuild">
+		<delete dir="${build.dir}" />
+	</target>
+-->
+	<target name="compile" >		
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="ape.classpath" source="1.8" target="1.8" optimize="true"  includeantruntime="false" />
+
+		<echo message="Copying Using ${instance.dir}/${instance}" />
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.*" />
+			</fileset>
+			<fileset dir="${instance.dir}/${instance}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+
+		<echo>Compile Success</echo>
+	</target>
+
+<!--
+	<target name="warCompile" depends="compile, build-sections">
+		<war destfile="${build.dir}/Logistics.war" webxml="${content.dir}/WEB-INF/web.xml">
+		  <fileset dir="${content.dir}">
+		  		<exclude name="Reports/*"/>
+		  </fileset>
+		  <classes dir="${classes.dir}"/>
+		</war>
+		<echo>War Creation Success</echo>
+	</target>
+	-->
+
+	<target name="build-sections" depends="compile">
+	  
+		<if>
+			<equals arg1="${build.OneSectionOnly}" arg2="true" />
+			<then>
+				<echo message="Building '${build.section}' section only" />
+				<foreach target="export-section-war" param="pSectionName">
+					<path>
+						<dirset dir="${src.dir}/com/storeelf/report/web/servlets/">							
+							<include name="${build.section}"/>
+							<exclude name="_internal_api"/>
+							<exclude name="sandbox"/>
+							<exclude name="EXAMPLE"/>
+						</dirset>
+					</path>
+				</foreach>
+			</then>
+			<else>
+				<echo message="Building all sections" />
+				<foreach target="export-section-war" param="pSectionName">					
+					<path>						
+						<dirset dir="${src.dir}/com/storeelf/report/web/servlets/">							
+							<include name="*"/>
+							<exclude name="_internal_api"/>
+							<exclude name="sandbox"/>
+							<exclude name="EXAMPLE"/>
+						</dirset>
+					</path>
+				</foreach>
+			</else>
+		</if>
+		<if>
+			<equals arg1="${build.deploy}" arg2="true" />
+			<then>
+				<echo message="Deployment triggered...'" />
+				<antcall target="deploy-war-file"/>
+			</then>
+			<else>
+				<echo message="Skipping deployment" />
+			</else>
+		</if>
+	</target>
+
+	<target name="export-section-war">
+		<script language="javascript">
+	        <![CDATA[
+	                // getting the value
+	                section_path = com_storeelf_report_web.getProperty("pSectionName");
+	    			section_name = section_path.split('servlets')[section_path.split('servlets').length-1];
+					section_name = section_name.substring(1);
+					uppercase_section_name = section_name.substring(0,1).toUpperCase() + section_name.substring(1);
+					com_storeelf_report_web.setProperty("lowercase-section-war", section_name);
+					com_storeelf_report_web.setProperty("section-war", uppercase_section_name);
+	            ]]>
+	    </script>
+		
+		
+		<if>
+			<equals arg1="${lowercase-section-war}" arg2="${build.section}" />
+			<then>
+				<echo message="Deleting existing ${section-war}"/>
+				<delete file="${build.dir}/${section-war}.war" />
+
+				<echo message="Creating new ${section-war}.war"/>
+				<war destfile="${build.dir}/${section-war}.war" webxml="${content.dir}/WEB-INF/web.xml">
+					<fileset dir="${content.dir}">
+				  		<exclude name="Reports/*"/>
+					</fileset>
+					<classes dir="${classes.dir}"/>
+				</war>
+			</then>
+			<else> 
+				<echo message="Deleting existing ${section-war}"/>
+				<delete file="${build.dir}/${section-war}.war" />
+
+				<echo message="Creating new ${section-war}.war"/>
+				<war destfile="${build.dir}/${section-war}.war" webxml="${content.dir}/WEB-INF/web.xml">
+					<fileset dir="${content.dir}">
+				  		<exclude name="Reports/*"/>
+					</fileset>
+					<classes dir="${classes.dir}"/>
+				</war>
+			</else>
+		</if>
+						
+		<if>
+			<equals arg1="${build.deploy}" arg2="true" />
+			<then>
+				<echo message="Deployment triggered...'" />		
+				<antcall target="stage-war-file">
+				    <param name="sectionWarFilePath" value="${build.dir}/${section-war}.war"/>
+				 	<param name="sectionWarFilename" value="${section-war}.war"/>
+				  </antcall>
+				<echo message="Deleting Tomcat cache'" />
+				
+				<for param="servername" list="${server_list}">
+				    <sequential>		    	
+				    	<delete failonerror="no" file="\\@{servername}\d$\prod\prop\Apache Software Foundation\Tomcat 8.0.15\work" />  
+				    </sequential>
+				</for>
+				
+			</then>
+			<else>
+					
+			</else>
+		</if>		
+	</target>
+
+	<target name="stage-war-file">
+		<echo message="Deleting existing deployed app ${section-war}"/>
+		<!--<delete failonerror="no" dir="\\k2ms2055\d$\prod\prop\Apache Software Foundation\Tomcat 8.0.15\webapps\${section-war}" />-->
+		<!--<delete failonerror="no" dir="\\ksms2054\d$\prod\prop\Apache Software Foundation\Tomcat 8.0.15\webapps\${section-war}" />-->
+		<!--<sleep seconds="3"/>-->
+		
+		<for param="servername" list="${server_list}">
+		    <sequential>
+		    	<delete failonerror="no" verbose="on" file="\\@{servername}\d$\prod\prop\Apache Software Foundation\Tomcat 8.0.15\webapps\${section-war}.war" />
+		    </sequential>
+		</for>
+		
+		<echo message="After deleting let's wait 5 seconds (give Tomcat some time to catch up)..."/>
+		<sleep seconds="5"/>
+		
+		<echo message="Staging new war file: ${sectionWarFilename}"/>
+		
+		<for param="servername" list="${server_list}">
+		    <sequential>		    	
+		    	<copy todir="\\@{servername}\d$\prod\prop\Apache Software Foundation\Tomcat 8.0.15\STAGED">
+    				<fileset file="${sectionWarFilePath}"/>
+    			</copy>  
+		    </sequential>
+		</for>
+		
+		
+	</target>
+	
+	<target name="deploy-war-file">
+		<echo message="Before deploying let's wait 10 seconds (give Tomcat some time to catch up)..."/>
+		<sleep seconds="20"/>
+		<echo message="Ok, done waiting..."/>
+		
+		<for param="servername" list="${server_list}">
+		    <sequential>		    	
+		    	<echo message="Deploying new storeelf app war files to @{servername}..."/>
+    			<move todir="\\@{servername}\d$\prod\prop\Apache Software Foundation\Tomcat 8.0.15\webapps\">
+    				<fileset dir="\\@{servername}\d$\prod\prop\Apache Software Foundation\Tomcat 8.0.15\STAGED">
+    					<include name="*.war"/>
+    				</fileset>
+    			</move>    	
+		    </sequential>
+		</for>
+		
+		<echo message="---------------------------"/>
+		<echo message="--- DEPLOYMENT COMPLETE ---"/>
+		<echo message="---------------------------"/>
+	</target>
+	
+<!--
+	<target name="tomcatReload" depends="warCompile">
+		<antcall target="server.reload">
+			<param name="webapp.name" value="${webapp.name}" />
+		</antcall>
+		<echo file="${webapp.dir}/version/storeelf.version" append="false">${stlabel}</echo>
+	</target>
+-->
+</project>

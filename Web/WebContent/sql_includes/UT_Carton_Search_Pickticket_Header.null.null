@@ -1,0 +1,5 @@
+select ch.pkt_ctrl_nbr, ph.cust_po_nbr, ph.ord_type, phi.stat_code, ph.ord_date
+ from carton_hdr ch, pkt_hdr ph, pkt_hdr_intrnl phi
+ where ph.pkt_ctrl_nbr = ch.pkt_ctrl_nbr
+ and ph.pkt_ctrl_nbr = phi.pkt_ctrl_nbr
+ and ch.carton_nbr = '%s' 

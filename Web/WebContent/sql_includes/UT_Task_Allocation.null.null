@@ -1,0 +1,8 @@
+select aid.alloc_invn_dtl_id as aid_id, aid.create_date_time, 
+ (select dsp_locn from locn_hdr where locn_id = aid.dest_locn_id) as dest_locn, 
+ aid.invn_need_type as need, aid.sku_id, aid.qty_alloc, aid.qty_pulld, aid.stat_code,
+ (select code_desc from sys_code where rec_type = 'S' and code_type = '551' and to_number(code_id) = aid.stat_code) as status,
+ user_id,
+ pkt_ctrl_nbr
+ from alloc_invn_dtl aid
+ where aid.alloc_invn_dtl_id in (select alloc_invn_dtl_id from task_dtl where task_id = '%s')

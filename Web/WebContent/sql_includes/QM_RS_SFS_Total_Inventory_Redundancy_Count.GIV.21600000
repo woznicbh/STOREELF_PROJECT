@@ -1,0 +1,45 @@
+WITH UNIQUE_SKU_COUNT
+  AS (SELECT COUNT (DISTINCT i.item_id) uniquecount
+          FROM GV_ADMIN.yfs_inventory_supply s1,
+                GV_ADMIN.yfs_inventory_item it,
+                GV_ADMIN.YFS_ITEM i,
+                GV_ADMIN.YFS_SHIP_NODE n
+          WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+                AND s1.SHIPNODE_KEY = n.SHIPNODE_KEY
+                AND it.INVENTORY_ITEM_KEY = s1.INVENTORY_ITEM_KEY
+                AND it.ITEM_ID = i.ITEM_ID
+                 AND i.extn_dept <> ' '
+                AND i.extn_dept <> '0983'
+                AND i.extn_dept <> '983'
+ 				AND s1.SHIPNODE_KEY in (SELECT n.shipnode_key 
+              FROM sterling.yfs_ship_node@OMS n
+              WHERE     UPPER (n.node_type) = 'STORE'
+              AND SHIPPING_CALENDAR_KEY != '                        ')
+                AND NOT EXISTS
+                           (SELECT 'x'
+                              FROM GV_ADMIN.yfs_inventory_supply s2
+                             WHERE     s2.INVENTORY_ITEM_KEY =
+                                          s1.INVENTORY_ITEM_KEY
+                                   AND s2.SHIPNODE_KEY IN
+                                          ('873', '809', '819', '829','810','830','840','855','860','865','875','885','890'))),
+     TOTAL_SKU_COUNT
+ AS (SELECT COUNT ((s.INVENTORY_ITEM_KEY)) AS totalcount
+          FROM GV_ADMIN.YFS_INVENTORY_SUPPLY s, sterling.yfs_ship_node@OMS n,
+ GV_ADMIN.yfs_inventory_item it,
+ GV_ADMIN.YFS_ITEM i
+         WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+               AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+            AND it.INVENTORY_ITEM_KEY = s.INVENTORY_ITEM_KEY
+            AND it.ITEM_ID = i.ITEM_ID
+            AND i.extn_dept <> ' '
+            AND i.extn_dept <> '0983'
+            AND i.extn_dept <> '983'
+  AND s.SHIPNODE_KEY in (SELECT n.shipnode_key FROM sterling.yfs_ship_node@OMS n
+  WHERE     UPPER (n.node_type) = 'STORE'
+ AND SHIPPING_CALENDAR_KEY != '                        ')  )
+ SELECT TRIM (TO_CHAR (uniquecount, '999,999,999,999,999')),
+       DECODE (totalcount,
+               0, '0',
+               ROUND ( (uniquecount / totalcount) * 100, 0))
+  FROM UNIQUE_SKU_COUNT, TOTAL_SKU_COUNT

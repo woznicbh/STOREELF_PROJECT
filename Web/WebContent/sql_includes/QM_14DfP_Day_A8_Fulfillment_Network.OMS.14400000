@@ -1,0 +1,43 @@
+WITH all_dt AS
+  (SELECT /*+ parallel(8) full(Head) full(Line) full(Stat) */ Head.Order_No,
+   stat.status,
+    SUM(Line.Original_Ordered_Qty) line_qty,
+    SUM(Stat.Status_Quantity) stat_qty
+ FROM  Yfs_Order_Header Head,
+     Yfs_Order_Line Line,
+     Yfs_Order_Release_Status Stat
+  WHERE Head.Order_Date    > TRUNC(Sysdate)-8
+ AND Head.Order_Date      < TRUNC(Sysdate)-7
+  AND Head.Enterprise_key  = 'STOREELF.COM'
+  AND Head.Document_Type   ='0001'
+  AND line.line_type      <> 'DSV'
+  AND Stat.status         <> '1400'
+  AND Head.Order_Header_Key=Line.Order_Header_Key
+  AND Stat.Order_Header_Key=Head.Order_Header_Key
+  AND Stat.Order_Line_Key  = Line.Order_Line_Key
+  AND Stat.Status_Quantity > 0
+ GROUP BY Head.Order_No, 
+   Stat.Status
+  ORDER BY Head.Order_No
+  ), 
+ Odr_Dt AS
+  (SELECT COUNT(DISTINCT Order_No) Odr_Count,SUM(stat_Qty) Ttl_Qty FROM All_Dt
+  ), 
+ Shp_Dt AS
+  (SELECT SUM(Stat_Qty) Shp_Qty
+  FROM All_Dt
+  WHERE Status >='3700'
+  AND Status    <'9000'
+  ),
+  Cncl_Dt AS
+  (SELECT SUM(Stat_Qty) Cncl_Qty FROM All_Dt WHERE Status ='9000'
+	  )
+ SELECT TO_CHAR(sysdate-8,'MM/DD/YYYY') Order_date,
+  trim(TO_CHAR(Odr_Count,'999,999,999,999,999')) Order_Count, 
+ trim(TO_CHAR(Ttl_Qty,'999,999,999,999,999')) Ttl_Units,
+  ROUND((Shp_Qty *100/Ttl_Qty),2) Shpd,
+  ROUND(((ttl_qty-shp_qty-cncl_qty)*100/ttl_qty),2) pend,
+  ROUND((Cncl_Qty*100/Ttl_Qty),2) Cncl
+ FROM odr_dt,
+  Shp_Dt,
+ cncl_Dt

@@ -1,0 +1,7 @@
+select ph.manif_nbr, mph.manif_type, mph.create_date_time, mph.close_date, 
+ mph.stat_code || ' ' || sc.code_desc as status, mph.pikup_rec_nbr
+ from pkt_hdr ph
+ left join manif_parcl_hdr mph on mph.manif_nbr = ph.manif_nbr
+ left join sys_code sc on sc.rec_type = 'S' and sc.code_type = '515' and to_number(sc.code_id) = mph.stat_code
+ where ph.pkt_ctrl_nbr = '%s'
+ and mph.stat_code = to_number(sc.code_id)

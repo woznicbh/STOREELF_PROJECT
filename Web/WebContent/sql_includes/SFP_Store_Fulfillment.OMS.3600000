@@ -1,0 +1,76 @@
+
+ WITH Each_Store
+ AS (SELECT description, n.shipnode_key AS store_num
+ FROM sterling.yfs_ship_node n
+ WHERE UPPER (n.node_type) = 'STORE'
+ AND SHIPPING_CALENDAR_KEY != ' '),
+ c1
+ AS (SELECT /*+ parallel(8) full(h) full(sl) full(s) */
+ s.shipnode_key AS store_num,
+ ROUND (AVG (s.status_date - h.order_date), 2) AS average
+ FROM sterling.yfs_order_header h,
+ sterling.yfs_shipment_line sl,
+ sterling.yfs_shipment s,
+ sterling.yfs_ship_node n
+ WHERE     sl.ORDER_HEADER_KEY = h.ORDER_HEADER_KEY
+ AND sl.shipment_key = s.shipment_key
+ AND UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND s.status = '1400'
+ AND s.status_Date > TRUNC (SYSDATE)
+ GROUP BY s.shipnode_key),
+ c2
+ AS (SELECT /*+ parallel(8) full(s) full (l) */
+ s.shipnode_key AS store_num,
+ NVL (SUM (l.quantity), 0) backlog
+ FROM sterling.yfs_shipment s,
+ sterling.yfs_shipment_line l,
+ sterling.yfs_ship_node n
+ WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND s.status < '1400'
+ AND l.shipment_key = s.shipment_key
+ GROUP BY s.shipnode_key),
+ c4
+ AS (SELECT /*+ parallel(8) full(s) full (l) */
+ s.shipnode_key AS store_num,
+ NVL (SUM (l.quantity), 0) ttlshpunitcnt
+ FROM sterling.yfs_shipment s,
+ sterling.yfs_shipment_line l,
+ sterling.yfs_ship_node n
+ WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND s.status = '1400'
+ AND l.shipment_key = s.shipment_key
+ AND s.status_date > TRUNC (SYSDATE)
+ GROUP BY s.shipnode_key),
+ c5
+ AS (SELECT /*+ parallel(8) full(s) full (l) */
+ s.shipnode_key AS store_num,
+ NVL (SUM (l.original_quantity), 0) cnclunitcnt
+ FROM sterling.yfs_shipment s,
+ sterling.yfs_shipment_line l,
+ sterling.yfs_ship_node n
+ WHERE     UPPER (n.NODE_TYPE) = 'STORE'
+ AND s.SHIPNODE_KEY = n.SHIPNODE_KEY
+ AND TRIM (s.status) = '9000'
+ AND l.shipment_key = s.shipment_key
+ AND s.status_date > TRUNC (SYSDATE)
+ GROUP BY s.shipnode_key)
+ SELECT Each_Store.description || ' - ' || TRIM (Each_Store.store_num)
+ AS store_name,
+ NVL (average, 0) AS average,
+ TRIM (TO_CHAR (NVL (backlog, 0), '999,999,999,999,999')) AS backlog,
+ 'N/A' pickunitcnt,
+ TRIM (TO_CHAR (NVL (ttlshpunitcnt, 0), '999,999,999,999,999')) AS ttlshpunitcnt,
+ TRIM (TO_CHAR (NVL (cnclunitcnt, 0), '999,999,999,999,999')) AS cnclunitcnt
+ FROM Each_Store
+ LEFT OUTER JOIN c1
+ ON Each_Store.store_num = c1.store_num
+ LEFT OUTER JOIN c2
+ ON Each_Store.store_num = c2.store_num
+ LEFT OUTER JOIN c4
+ ON Each_Store.store_num = c4.store_num
+ LEFT OUTER JOIN c5
+ ON Each_Store.store_num = c5.store_num
+ ORDER BY CAST (each_store.store_num AS INTEGER)

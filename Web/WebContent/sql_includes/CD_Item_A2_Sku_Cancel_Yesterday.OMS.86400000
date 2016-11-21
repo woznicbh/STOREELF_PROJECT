@@ -1,0 +1,9 @@
+ with v1 as(select  /*+ parallel(8) full(line) full(ors) full(head) full(it)*/ sum(ors.status_quantity) "CANCELQTY", TRIM(it.item_id) "ITEMID",it.short_description "ITEM_DESC",it.unit_cost "COST"				
+  from sterling.yfs_order_line line, sterling.yfs_order_release_status ors ,sterling.yfs_order_header head                                              
+  , sterling.yfs_item it where ors.order_release_status_key > TO_CHAR(SYSDATE - 1,'YYYYMMDD') and ors.order_release_status_key < TO_CHAR(SYSDATE,'YYYYMMDD') and ors.status_quantity > 0 and ors.status = '9000'                               
+  and head.document_type = '0001' and line.order_header_key = head.order_header_key 
+ and line.order_line_key = ors.order_line_key and it.item_id = line.item_id group by it.item_id,it.short_description,it.unit_cost order by CANCELQTY desc),    
+  v2 as (select ROWNUM "RNUM" , v1.CANCELQTY "CANCELQTY", v1.ITEMID "ITEMID",v1.ITEM_DESC "ITEM_DESC",                                                  
+  (v1.CANCELQTY * v1.COST) "CANCDELLEDDOLLAR"   from v1 where ROWNUM <= 10)                                                                                   
+  select CANCELQTY,ITEMID,ITEM_DESC,CANCDELLEDDOLLAR from v2 where RNUM = 2                                                                                     
+ 

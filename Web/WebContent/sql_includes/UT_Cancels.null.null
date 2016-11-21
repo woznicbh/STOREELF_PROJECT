@@ -1,0 +1,4 @@
+select opd.pkt_ctrl_nbr, opd.pkt_seq_nbr, opd.sku_id, opd.orig_pkt_qty, opd.shpd_qty, (opd.orig_pkt_qty - opd.shpd_qty) as DIFFORIGSHPD
+ from outpt_pkt_dtl opd
+ where opd.pkt_ctrl_nbr = '%s'
+ and opd.orig_pkt_qty - opd.shpd_qty > 0

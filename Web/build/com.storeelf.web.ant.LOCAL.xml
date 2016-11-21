@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="warCompile" name="com.storeelf.report.web">
+	<property file="build/com.storeelf.web.ant.properties" />
+	<property name="build.lib" value="WebContent/WEB-INF/lib" />
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="content.dir" value="WebContent" />
+	<property name="instance.dir" value="instance" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="section.name" value="Logistics"/>
+
+	<!-- SDK and classpath info -->
+	<path id="ape.classpath">
+		 <fileset dir="${content.dir}//WEB-INF/lib">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${build.lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+<!--	<target name="precleanbuild">
+		<delete dir="${build.dir}" />
+	</target>
+-->
+	<target name="compile" >
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="ape.classpath" source="1.8" target="1.8" optimize="true" verbose="true"  includeantruntime="false" />
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.*" />
+			</fileset>
+			<fileset dir="${instance.dir}/${instance}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<echo>Compile Success</echo>
+	</target>
+
+	<target name="warCompile" depends="compile">
+		<delete file="${build.dir}/${section.name}.war" />
+		<war destfile="${build.dir}/${section.name}.war" webxml="${content.dir}/WEB-INF/web.xml">
+		  <fileset dir="${content.dir}">
+		  		<exclude name="Reports/*"/>
+		  		<exclude name="WEB-INF/lib/servlet-api.jar"/>
+		  </fileset>
+		  <classes dir="${classes.dir}"/>
+		</war>
+		<echo>War Creation Success</echo>
+	</target>
+<!--
+	<target name="tomcatReload" depends="warCompile">
+		<antcall target="server.reload">
+			<param name="webapp.name" value="${webapp.name}" />
+		</antcall>
+		<echo file="${webapp.dir}/version/storeelf.version" append="false">${stlabel}</echo>
+	</target>
+-->
+</project>

@@ -1,0 +1,1 @@
+select /*+ parallel(8) full(l) full(h) */ trim(TO_CHAR(SUM(l.ordered_qty),'999,999,999,999,999'))AS "COUNT" from  yfs_order_line l, yfs_order_header h where h.order_date > trunc(sysdate) and h.document_type = '0001' and h.enterprise_key = 'STOREELF.COM' and l.order_header_key = h.order_header_key

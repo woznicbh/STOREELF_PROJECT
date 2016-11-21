@@ -1,0 +1,7 @@
+select td.alloc_invn_dtl_id as aid_id, td.mod_date_time, 
+ (select dsp_locn from locn_hdr where locn_id = td.dest_locn_id) as dest_locn, 
+ td.invn_need_type as need, td.sku_id, td.qty_alloc, td.qty_pulld, td.stat_code,
+ (select code_desc from sys_code where rec_type = 'S' and code_type = '553' and to_number(code_id) = td.stat_code) as status,
+ user_id
+ from task_dtl td
+ where td.task_id = '%s'

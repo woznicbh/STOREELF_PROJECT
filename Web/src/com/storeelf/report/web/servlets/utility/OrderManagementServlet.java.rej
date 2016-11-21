@@ -1,0 +1,6 @@
+diff a/Web/src/com/storeelf/report/web/servlets/utility/OrderManagementServlet.java b/Web/src/com/storeelf/report/web/servlets/utility/OrderManagementServlet.java	(rejected hunks)
+@@ -118,3 +118,3 @@
+ 								+ "\n When status.description like '%DSV%'"
+-								+ "\n Then 'DSV'"
++								+ "\n Then 'DSVV'"
+ 								+ "\n Else ' ' "
