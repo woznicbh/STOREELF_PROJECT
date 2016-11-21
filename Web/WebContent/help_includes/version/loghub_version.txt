@@ -1,3 +1,0 @@
-groovy_version=NA
-web_version=6.1.1.14
-report_version=SEPT_R2_1.0.0.6
