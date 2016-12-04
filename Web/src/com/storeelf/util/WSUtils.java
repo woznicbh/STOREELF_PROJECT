@@ -22,7 +22,6 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.log4j.Logger;
 
 import com.google.common.reflect.ClassPath;
-import com.storeelf.report.web.servlets.utility.OrderCancelHelper;
 import com.storeelf.util.exception.StoreElfException;
 
 /**
@@ -30,7 +29,7 @@ import com.storeelf.util.exception.StoreElfException;
  */
 
 public class WSUtils {
-	static final Logger			logger				= Logger.getLogger(OrderCancelHelper.class);
+	static final Logger			logger				= Logger.getLogger(WSUtils.class);
 	
 	public static Class[] getClasses(String packageName) {
 		ArrayList<Class> classes = new ArrayList<Class>();

@@ -28,7 +28,6 @@ import com.storeelf.report.web.model.SQLModel;
 import com.storeelf.report.web.model.SearchFieldModal;
 import com.storeelf.report.web.model.impl.SearchFieldModalImpl;
 import com.storeelf.util.SQLUtils;
-import com.storeelf.util.model.impl.SCWSEnv;
 
 /**
  * <B>Class Name:</B><BR/>
@@ -99,7 +98,6 @@ public class Constants{
 	public static HashMap<String, HashMap<String, String>> GLOBAL_SESSION_ATTRIBUTE_MAP	= new HashMap<String, HashMap<String, String>>();
 
 	public static final String STOREELF_RO = "STOREELF";
-	public static final String LID = "LID";
 	public static final String OMS = "OMS";
 	public static final String OMSPII = "OMS_PII";
 	public static final String EFC = "EFC";
@@ -132,33 +130,6 @@ public class Constants{
 	public static final String COGNOS_WEEKLY = "COGNOS_WEEKLY";
 	public static final String COGNOS_ON_DEMAND = "COGNOS_ON_DEMAND";
 	public static final String GIV = "GIV";
-	public static final String VENDOR_COMPLIANCE_IMG_DIR = "VENDOR_COMPLIANCE_IMG_DIR";
-	public static final String VENDOR_COMPLIANCE_DIR = "VENDOR_COMPLIANCE_DIR";
-	public static final String COMPLIANCE_EFC3_DIR = "COMPLIANCE_EFC3_DIR";
-	public static final String COMPLIANCE_EFC3_IMG_DIR = "COMPLIANCE_EFC3_IMG_DIR";
-
-	//Start : OMSr changes
-	public static final String OMSr = "OMSr";
-	public static final String OMS_PSHP = "OMS_PSHP";
-	public static final String OMSr_TXN_PRM = "OMSr_TXN_PRM";
-	//End : OMSr changes
-
-	//Start : OMSr Training changes
-	public static final String OMSr_Training = "OMSr_Training";
-	//End : OMSr Training changes
-
-	//Start : OCF changes
-	public static final String STORES = "STORES";
-	//End : OCF changes
-
-	public static final String FASHION_SALES = "FS";
-	public static final String APPSERVER = "APPSERVER";
-	public static final String AGENTSERVER = "AGENT";
-	public static final String INTSERVER = "INT";
-	public static final String HEALTHMONITOR = "HEALTH";
-	public static final String TIBCO = "TIBCO";
-	public static final String INTEGRATION = "INTEGRATION";
-
 	public static final HashMap<String,String> STOREELF_MYSQL_DASHBOARD_PILOT = new HashMap<String,String>();
 
 	public static final ArrayList<String> EFC_LIST = new ArrayList<String>();
@@ -627,12 +598,6 @@ public class Constants{
 		DB_TYPE_MAP.put(DBTYPE_ORACLE, 1);
 		DB_TYPE_MAP.put(DBTYPE_DB2, 2);
 		DB_TYPE_MAP.put(DBTYPE_MYSQL, 3);
-	}
-
-	public static TreeMap<String, Integer> ENV_TYPE_MAP = new TreeMap<String, Integer>();
-	static {
-		ENV_TYPE_MAP.put(ENVTYPE_WS, SCWSEnv.TYPE);
-
 	}
 
 	public static TreeMap<String, String> REFERENCE_MAP = new TreeMap<String, String>();
@@ -2503,8 +2468,6 @@ public class Constants{
 
 		SQL_INST.put(ID_SERVER_STAT, OMS);
 		SQL_INST.put(ID_SERVER_STAT_GIV, GIV);
-		SQL_INST.put(ID_SERVER_STAT_OMSr, OMSr);
-		SQL_INST.put(ID_SERVER_STAT_OMSr_Training, OMSr_Training);
 		SQL_INST.put(ID_EFC1_REDUNDANCY_COUNT, GIV);
 		SQL_INST.put(ID_EFC2_REDUNDANCY_COUNT, GIV);
 		SQL_INST.put(ID_EFC3_REDUNDANCY_COUNT, GIV);

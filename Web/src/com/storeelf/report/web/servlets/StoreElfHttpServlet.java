@@ -35,15 +35,12 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.storeelf.report.web.Constants;
 import com.storeelf.report.web.init.ReportActivator;
 import com.storeelf.report.web.model.StoreElfSearchHistoryEntityModel;
-import com.storeelf.report.web.model.SQLModel;
 import com.storeelf.report.web.security.StoreElfCache;
 import com.storeelf.report.web.security.StoreElfCacheManager;
 import com.storeelf.util.XProperties;
@@ -97,12 +94,6 @@ public class StoreElfHttpServlet<T> extends HttpServlet{
 		String req_component_name			= "";
 		String req_module_name				= "";
 		Class<?> servletClass				= null;
-		JsonObject 	upTime = new JsonObject();
-		JsonArray   upTime_array = new JsonArray();
-		JsonObject		rootReturn  			= new JsonObject();
-		String			content 			= "-error-";
-		PrintWriter		response_Writer	= null;
-		Gson 			gsonn	         		= new GsonBuilder().create();
 		
 
 		try{
@@ -124,8 +115,7 @@ public class StoreElfHttpServlet<T> extends HttpServlet{
 			
 			
 			
-			//response.setHeader("X-Powered-By","Your mom");
-			response.setHeader("X-Powered-By","Logistics Service Delivery");
+			response.setHeader("X-Powered-By","Your Retail Helper");
 			response.setHeader("X-Frame-Options", "SAMEORIGIN");
 			
 
@@ -253,7 +243,6 @@ public class StoreElfHttpServlet<T> extends HttpServlet{
 			}else if(StringUtils.equals(req_component_name, "HAZELCAST")){
 				HazelcastInstance		hazelcastInstance	= Hazelcast.getHazelcastInstanceByName(Constants.STOREELF_HAZELCAST_INSTANCE_NAME);
 				PrintWriter responseWriter = response.getWriter();
-				Gson gson = new GsonBuilder().create();
 				String response_content = "-error-";
 				
 				IMap<Object, Object> STOREELF_SESSIONS			= hazelcastInstance.getMap("STOREELF_SESSIONS");

@@ -21,7 +21,7 @@ public class DefaultFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
           throws IOException, ServletException {
-    	((HttpServletResponse)response).setHeader("X-Powered-By","Your mom");
+    	((HttpServletResponse)response).setHeader("X-Powered-By","Your Retail Helper");
         defaultRequestDispatcher.forward(request, response);
     }
 

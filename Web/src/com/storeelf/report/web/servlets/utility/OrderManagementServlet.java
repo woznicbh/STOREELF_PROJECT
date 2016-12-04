@@ -143,7 +143,7 @@ public class OrderManagementServlet extends StoreElfHttpServlet<Object> {
 						DirectShip_search_value = search_value + "_%";
 					}
 
-					if(isPOCorder) conOMSr_TXN_PRM			= ReportActivator.getInstance().getConnection(Constants.OMSr_TXN_PRM);
+					if(isPOCorder) conOMSr_TXN_PRM			= ReportActivator.getInstance().getConnection(Constants.OMS);
 
 					sql = SQLConstants.SQL_MAP.get(SQLConstants.ID_UTIL_ORDER_LINE_SQL);
 					omsState = con.prepareStatement(sql);
@@ -304,7 +304,7 @@ public class OrderManagementServlet extends StoreElfHttpServlet<Object> {
 							;
 
 					//result = SQLUtils.getSQLResult(sql, con);
-					if(isPOCorder) conOMSr_TXN_PRM		= ReportActivator.getInstance().getConnection(Constants.OMSr_TXN_PRM);							
+					if(isPOCorder) conOMSr_TXN_PRM		= ReportActivator.getInstance().getConnection(Constants.OMS);							
 
 					int result_size = 0;
 					orderSet = con.createStatement().executeQuery(sql);
@@ -511,7 +511,7 @@ public class OrderManagementServlet extends StoreElfHttpServlet<Object> {
 							+ "where ol.order_header_key=oh.order_header_key "
 							+ "and oh.order_no='"+ nonDirectShip_search_value +"'";
 
-					conOMSr_TXN_PRM		= ReportActivator.getInstance().getConnection(Constants.OMSr_TXN_PRM);
+					conOMSr_TXN_PRM		= ReportActivator.getInstance().getConnection(Constants.OMS);
 					rs = con.createStatement().executeQuery(sql);
 					while (rs.next())
 					{
@@ -3206,11 +3206,11 @@ public class OrderManagementServlet extends StoreElfHttpServlet<Object> {
 		String          fs_schema       = null;
 		String          to_return       = null;
 		try{
-		conFS = ReportActivator.getInstance().getConnection(Constants.FASHION_SALES);
+		conFS = ReportActivator.getInstance().getConnection(Constants.OMS);
 
 
 		fs_schema = ReportActivator.getInstance().getReportDBMap()
-				.get(Constants.FASHION_SALES).getSchema();
+				.get(Constants.OMS).getSchema();
 
 		sql_fs =  "\n  WITH x"
 				+ "\n  AS (SELECT t.loc_nbr ship_node, t.onhand_qty quantity"
