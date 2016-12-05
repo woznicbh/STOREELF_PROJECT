@@ -6,7 +6,7 @@
   </welcome-file-list>
 
   <listener>
-  	<listener-class>com.storeelf.report.web.listener.STOREELFContextListener</listener-class>
+  	<listener-class>com.storeelf.report.web.listener.StoreElfContextListener</listener-class>
   </listener>
   <listener>
     <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
@@ -25,7 +25,7 @@
 
   <filter>
     <filter-name>ShiroFilter</filter-name>
-    <!-- <filter-class>com.storeelf.report.web.servlets.STOREELFWebSecurityFilter</filter-class> -->
+    <!-- <filter-class>com.storeelf.report.web.servlets.StoreElfWebSecurityFilter</filter-class> -->
     <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
   </filter>
 <!--   <filter>
@@ -52,9 +52,9 @@
   </servlet>
   <servlet>
     <description>Servlet to authenticate User against AD</description>
-    <display-name>STOREELFHttpServlet</display-name>
-    <servlet-name>STOREELFHttpServlet</servlet-name>
-    <servlet-class>com.storeelf.report.web.servlets.STOREELFHttpServlet</servlet-class>
+    <display-name>StoreElfHttpServlet</display-name>
+    <servlet-name>StoreElfHttpServlet</servlet-name>
+    <servlet-class>com.storeelf.report.web.servlets.StoreElfHttpServlet</servlet-class>
     <init-param>
       <param-name>loginpage</param-name>
       <param-value>login.jsp</param-value>
@@ -89,7 +89,7 @@
     <url-pattern>/mobile/MLogoutUser</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>STOREELFHttpServlet</servlet-name>
+    <servlet-name>StoreElfHttpServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
   <!--This mapping makes the favicon works on Tomcat-->

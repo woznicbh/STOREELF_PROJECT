@@ -44,7 +44,7 @@ public class ReportActivator {
 		try {
 			if(systemProperties==null){
 				ReportActivator.systemProperties = new XProperties();
-				ReportActivator.systemProperties.load(ReportActivator.class.getResourceAsStream("storeelf.properties"));
+				ReportActivator.systemProperties.load(ReportActivator.class.getResourceAsStream("StoreElf.properties"));
 			}
 		} catch (IOException e) { e.printStackTrace(); }		
 		return systemProperties;
@@ -66,7 +66,7 @@ public class ReportActivator {
 	ClassNotFoundException, SQLException {
 
 		ReportActivator.systemProperties = new XProperties();
-		ReportActivator.systemProperties.load(this.getClass().getResourceAsStream("storeelf.properties"));
+		ReportActivator.systemProperties.load(this.getClass().getResourceAsStream("StoreElf.properties"));
 		this.reportDBMap.put(Constants.STOREELF_RO, this.getDB(Constants.STOREELF_RO));
 		
 	}
