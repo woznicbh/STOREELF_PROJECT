@@ -1,9 +1,6 @@
 package com.storeelf.report.web.listener;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.Inet4Address;
-import java.net.URL;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -31,8 +28,8 @@ import com.hazelcast.config.WanTargetClusterConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.storeelf.report.web.Constants;
-import com.storeelf.report.web.agents.StoreElfRefreshSQLAgent;
 import com.storeelf.report.web.agents.StoreElfHZKeepAliveAgent;
+import com.storeelf.report.web.agents.StoreElfRefreshSQLAgent;
 import com.storeelf.report.web.init.ReportActivator;
 import com.storeelf.util.XProperties;
 
@@ -58,22 +55,26 @@ public class StoreElfContextListener implements ServletContextListener {
 		 */
 		//Commenting out due to storeelf not starting when this is run
 		//SQLModel.deleteAgentIntegInfo();
-		
-		for(Entry<String, PreparedStatement> entry :Constants.STOREELF_SQL_STMT_MAP.entrySet()){
-			try{
-				
-				PreparedStatement ps = entry.getValue();
-				
-				//cancel the query if it's still running
-				if(ps.isClosed()==false) ps.cancel();
-			
-			}catch(Exception e){ e.printStackTrace();}
+		if (Constants.STOREELF_SQL_STMT_MAP != null) {
+			for (Entry<String, PreparedStatement> entry : Constants.STOREELF_SQL_STMT_MAP.entrySet()) {
+				try {
+
+					PreparedStatement ps = entry.getValue();
+
+					// cancel the query if it's still running
+					if (ps.isClosed() == false)
+						ps.cancel();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		
 		
 		if(Constants.STOREELF_DASHBOARD_EXECUTOR_SERVICE!=null)		Constants.STOREELF_DASHBOARD_EXECUTOR_SERVICE.shutdownNow();
-		if(Constants.STOREELF_UTILITY_EXECUTOR_SERVICE!=null)			Constants.STOREELF_UTILITY_EXECUTOR_SERVICE.shutdownNow();
+		if(Constants.STOREELF_UTILITY_EXECUTOR_SERVICE!=null)		Constants.STOREELF_UTILITY_EXECUTOR_SERVICE.shutdownNow();
 		if(Constants.STOREELF_HZ_KEEP_ALIVE_EXECUTOR_SERVICE!=null)	Constants.STOREELF_HZ_KEEP_ALIVE_EXECUTOR_SERVICE.shutdownNow();
 		
 		HazelcastInstance	hazelcastInstance	= Hazelcast.getHazelcastInstanceByName(Constants.STOREELF_HAZELCAST_INSTANCE_NAME);
@@ -179,9 +180,9 @@ public class StoreElfContextListener implements ServletContextListener {
 			 
 			switch (contextPath) {
 				case "/Dashboard":		config.getNetworkConfig().setPort( 5701 ).setPortAutoIncrement( true );	logger.info("Starting HZ Dashboard		on 5701");	break;
-				case "/Utility":		config.getNetworkConfig().setPort( 5703 ).setPortAutoIncrement( true );	logger.info("Starting HZ Utility		on 5702");	break;
-				case "/Security":		config.getNetworkConfig().setPort( 5705 ).setPortAutoIncrement( true );	logger.info("Starting HZ Security		on 5703");	break;
-				case "/Help":			config.getNetworkConfig().setPort( 5706 ).setPortAutoIncrement( true );	logger.info("Starting HZ Help			on 5704");	break;
+				case "/Utility":		config.getNetworkConfig().setPort( 5702 ).setPortAutoIncrement( true );	logger.info("Starting HZ Utility		on 5702");	break;
+				case "/Security":		config.getNetworkConfig().setPort( 5703 ).setPortAutoIncrement( true );	logger.info("Starting HZ Security		on 5703");	break;
+				case "/Help":			config.getNetworkConfig().setPort( 5704 ).setPortAutoIncrement( true );	logger.info("Starting HZ Help			on 5704");	break;
 			default:					config.getNetworkConfig().setPortAutoIncrement(true);												break;
 			}
 			JoinConfig	join = config.getNetworkConfig().getJoin();
@@ -319,32 +320,7 @@ public class StoreElfContextListener implements ServletContextListener {
 		}
 		return null;
 	}
-	
-	/**
-	 * Pings a HTTP URL. This effectively sends a HEAD request and returns <code>true</code> if the response code is in 
-	 * the 200-399 range.
-	 * @param url The HTTP URL to be pinged.
-	 * @param timeout The timeout in millis for both the connection timeout and the response read timeout. Note that
-	 * the total timeout is effectively two times the given timeout.
-	 * @return <code>true</code> if the given HTTP URL has returned response code 200-399 on a HEAD request within the
-	 * given timeout, otherwise <code>false</code>.
-	 */
-	public static boolean ping(String url, int timeout) {
-	    // Otherwise an exception may be thrown on invalid SSL certificates:
-	    url = url.replaceFirst("^https", "http");
-
-	    try {
-	        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-	        connection.setConnectTimeout(timeout);
-	        connection.setReadTimeout(timeout);
-	        connection.setRequestMethod("HEAD");
-	        int responseCode = connection.getResponseCode();
-	        return (200 <= responseCode && responseCode <= 399);
-	    } catch (IOException exception) {
-	        return false;
-	    }
-	}
-	
+		
 	public int getStoreElfDashboardThreadMax(){
 		String STOREELF_DASHBOARD_SQL_THREAD_MAX = getStoreElfProperty("STOREELF.STOREELF_DASHBOARD_SQL_THREAD_MAX");
 		if (STOREELF_DASHBOARD_SQL_THREAD_MAX==null){ return Constants.STOREELF_DASHBOARD_SQL_THREAD_MAX;}

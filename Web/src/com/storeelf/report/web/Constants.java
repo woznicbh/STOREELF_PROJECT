@@ -97,7 +97,8 @@ public class Constants{
 
 	public static HashMap<String, HashMap<String, String>> GLOBAL_SESSION_ATTRIBUTE_MAP	= new HashMap<String, HashMap<String, String>>();
 
-	public static final String STOREELF_RO = "STOREELF";
+	public static final String STOREELF_RO = "STOREELF_RO";
+	public static final String STOREELF_WR = "STOREELF_WR";
 	public static final String OMS = "OMS";
 	public static final String OMSPII = "OMS_PII";
 	public static final String EFC = "EFC";
@@ -1034,30 +1035,6 @@ public class Constants{
 	//End MarketPlace 2014 changes
 
 	public static TreeMap<String, String> SQL_MAP = new TreeMap<String, String>();
-	static {
-				SQL_MAP.put(ID_UTIL_CANCEL_ORDER_WMOS_SQL2, "select o.do_status, ds.description, o.tc_order_id "
-												+ "from orders o, do_status ds " 
-				                       			+ "where o.do_status = ds.order_status "
-				                       			+ "and o.ext_purchase_order = ? ");
-				
-				
-				try {
-					for (HashMap<String, Object> map : (SQLUtils.getSQLResult(
-							"Select SQL_NAME, LOGGING_SQL from lh_logging_sql",
-							ReportActivator.getInstance().getConnection(Constants.STOREELF_RO))).values()) {
-						String sql_name = String.valueOf(map.get("SQL_NAME")).trim();
-						String logging_sql = String.valueOf(map.get("LOGGING_SQL")).trim();
-						SQL_MAP.put(sql_name, logging_sql);
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-		        
-				
-			
-	}
 
 	
 	
@@ -1342,20 +1319,6 @@ public class Constants{
 		SQL_MODEL_MAP.put(MP_PRODUCT_TREND_SQL,       "com.storeelf.report.web.model.impl.MultiColumnModal");
 		//End MarketPlace 2014 changes
 		
-		try {
-			for (HashMap<String, Object> map : (SQLUtils.getSQLResult(
-					"Select SQL_NAME, MODEL_IMPL from lh_logging_sql",
-					ReportActivator.getInstance().getConnection(Constants.STOREELF_RO))).values()) {
-				String sql_name = String.valueOf(map.get("SQL_NAME")).trim();
-				String model_imp = String.valueOf(map.get("MODEL_IMPL")).trim();
-				SQL_MODEL_MAP.put(sql_name, model_imp);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 	}
 
 
@@ -1599,20 +1562,6 @@ public class Constants{
 
 		SQL_TIME_MAP.put(ID_SIM_REPORT, Long.valueOf(1800000));
 		SQL_TIME_MAP.put(ID_ORDER_EXCEPTION_REPORT, Long.valueOf(1800000));
-
-		try {
-			for (HashMap<String, Object> map : (SQLUtils.getSQLResult(
-					"Select SQL_NAME, RUN_TIME from lh_logging_sql",
-					ReportActivator.getInstance().getConnection(Constants.STOREELF_RO))).values()) {
-				String sql_name = String.valueOf(map.get("SQL_NAME")).trim();
-				String run_time = String.valueOf(map.get("RUN_TIME")).trim();
-				SQL_TIME_MAP.put(sql_name, Long.valueOf(Integer.parseInt(run_time)));
-				}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		
 		//WMOS dashboard changes
 		//10 minutes
@@ -1651,24 +1600,6 @@ public class Constants{
 		SQL_FRM_SIM.put(ID_SIM_REPORT, SQL_MAP.get(ID_SIM_REPORT));
 	}
 
-	//Splunk Logging
-	public static TreeMap<String, String> SQL_SPLUNK_LOG = new TreeMap<String, String>();
-	static{
-		
-		try {
-			for (HashMap<String, Object> map : (SQLUtils.getSQLResult(
-					"Select SQL_NAME from lh_logging_sql",
-					ReportActivator.getInstance().getConnection(Constants.STOREELF_RO))).values()) {
-				String sql_name = String.valueOf(map.get("SQL_NAME")).trim();
-				SQL_SPLUNK_LOG.put(sql_name, SQL_MAP.get(sql_name));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
 	public static TreeMap<String, String> SQL_FRM_ODR_EXECPTION = new TreeMap<String, String>();
 	static {
 		SQL_FRM_ODR_EXECPTION.put(ID_ORDER_EXCEPTION_REPORT,					SQL_MAP.get(ID_ORDER_EXCEPTION_REPORT));
@@ -1880,11 +1811,6 @@ public class Constants{
 		SQL_FRM_SIM.put(ID_SERVER_STAT_OMSr, SQL_MAP.get(ID_SERVER_STAT_OMSr));
 		SQL_FRM_SIM.put(ID_SERVER_STAT_OMSr_Training, SQL_MAP.get(ID_SERVER_STAT_OMSr_Training));
 }
-	//Splunk Logging
-	public static TreeMap<String, String> SQL_FRM_SPLUNK_LOGGING = new TreeMap<String, String>();
-	static{
-		SQL_SPLUNK_LOG.put("", "");
-	}
 
 	public static TreeMap<String, String> SQL_FRM_RDC_3 = new TreeMap<String, String>();
 	static {
@@ -2197,21 +2123,6 @@ public class Constants{
 
 		SQL_DESC.put(ID_SIM_REPORT, "SIM/RED");
 		SQL_DESC.put(ID_ORDER_EXCEPTION_REPORT, "RDC Order Exception Report");
-
-				
-		try {
-			for (HashMap<String, Object> map : (SQLUtils.getSQLResult(
-					"Select SQL_NAME, DESCRIPTION from lh_logging_sql",
-					ReportActivator.getInstance().getConnection(Constants.STOREELF_RO))).values()) {
-				String sql_name = String.valueOf(map.get("SQL_NAME")).trim();
-				String description = String.valueOf(map.get("DESCRIPTION")).trim();
-				SQL_DESC.put(sql_name, description);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		
 		SQL_DESC.put(ID_COLLATE_TIME1, "Collate Print Time (Seconds)");
 		SQL_DESC.put(ID_COLLATE_TIME2, "Collate Print Time (Seconds)");
@@ -2520,20 +2431,6 @@ public class Constants{
 		SQL_INST.put(MP_DAILY_FULFILL_SQL, OMS);
 		SQL_INST.put(MP_PRODUCT_TREND_SQL, OMS);
 		//End MarketPlace 2014 Changes
-		
-		try {
-			for (HashMap<String, Object> map : (SQLUtils.getSQLResult(
-					"Select SQL_NAME, DESCRIPTION from lh_logging_sql",
-					ReportActivator.getInstance().getConnection(Constants.STOREELF_RO))).values()) {
-				String sql_name = String.valueOf(map.get("SQL_NAME")).trim();
-				String sql_db = String.valueOf(map.get("SQL_DB")).trim();
-				SQL_INST.put(sql_name, sql_db);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 	}
 
@@ -3887,51 +3784,6 @@ public class Constants{
 	public static Map<String,String> SQL_QUERY_MAP=new TreeMap<String, String>();
 	public static Map<String,String> SQL_DESC_MAP=new TreeMap<String, String>();
 	public static Map<String,Long> SQL_TIME_MAP2=new TreeMap<String, Long>();
-	static{
-		try {
-			String sql = "Select * from lh_map_sql";
-			
-			Connection con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-		
-
-			ConcurrentHashMap<Integer, HashMap<String, Object>> headercharges = SQLUtils.getSQLResult(sql, con);
-
-			for (HashMap<String, Object> map : headercharges.values()) {
-				String id=String.valueOf(map.get("SQL_ID")).trim();
-				SQL_ID_MAP.put(id, id);
-				String model=String.valueOf(map.get("SQL_MODEL")).trim();
-				if(!model.equals("null")){
-					SQL_MODEL_MAP.put(id, model);
-			    }
-				String inst=String.valueOf(map.get("SQL_INST")).trim();
-				if(!inst.equals("null")){
-					//here
-					SQL_INST.put(id,inst );
-				}
-				String query=String.valueOf(map.get("SQL_QUERY")).trim();
-				if(!query.equals("null")){
-					SQL_MAP.put(id, query);
-				}
-				String desc =String.valueOf(map.get("SQL_DESC")).trim();
-				if(!desc.equals("null")){
-					SQL_DESC_MAP.put(id, desc);
-				}
-				String time= String.valueOf(map.get("SQL_TIME")).trim();
-				if(!time.equals("null")){
-					SQL_TIME_MAP.put(id, Long.parseLong(time));
-				}
-				
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		
-		
-	}
-	
 	
 }

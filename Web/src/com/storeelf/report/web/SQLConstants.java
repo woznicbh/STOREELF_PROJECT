@@ -268,111 +268,7 @@ public class SQLConstants {
 						+"\n		ON g.order_release_key = e.order_release_key            "
 						+"\n	WHERE b.order_no       = '16010210140842328'                "
 						+"\n		ORDER BY a.prime_line_no                                ");
-		/*
-	SQL_MAP.put(
-		ID_UTIL_ORDER_HEADER_CHANGES_SQL,
-			"SELECT head.order_no,                                     			"
-			+ " \n   CASE                                              			"
-			+ " \n     WHEN hold.status = '1100'                       			"
-			+ " \n     THEN 'Y'                                        			"
-			+ " \n     ELSE 'N'                                        			"
-			+ " \n   END                     AS ON_HOLD,               			"
-			+ " \n   UPPER(pi.address_line1) AS address,               			"
-			+ " \n   UPPER(trim(pi.state))   AS state,                 			"
-			+ " \n   pi.zip_code,                                      			"
-			+ " \n   SUBSTR(notes.REASON_CODE,7) AS shipnode,          			"
-			+ " \n   notes.note_text             AS ReceiptID          			"
-			+ " \n FROM yfs_order_header head                 	   				"
-			+ " \n   left outer join yfs_order_hold_type hold          			"
-			+ " \n   on head.order_header_key = hold.order_header_key  			"
-			+ " \n   join yfs_person_info pi                           			"
-			+ " \n   on head.bill_to_key      = pi.person_info_key     			"
-			+ " \n   join yfs_notes notes                              			"
-			+ " \n   on head.order_header_key = notes.table_key        			"
-			+ " \n WHERE head.order_no  = '"+ nonDirectShip_search_value +"'   	"
-			+ " \n AND notes.table_name      ='YFS_ORDER_HEADER'       			"
-			+ " \n AND notes.reason_code LIKE 'Pree%'                  			");
-
-	SQL_MAP.put(
-		ID_UTIL_ORDER_HEADER_CHANGES_SQL2,
-			"SELECT head.order_no,                                     			"
-			+ " \n   CASE                                              			"
-			+ " \n     WHEN hold.status = '1100'                       			"
-			+ " \n     THEN 'Y'                                        			"
-			+ " \n     ELSE 'N'                                        			"
-			+ " \n   END                     AS ON_HOLD,               			"
-			+ " \n   'n/a'	AS address,               		   					"
-			+ " \n   'n/a'   AS state,           		           				"
-			+ " \n   'n/a' AS shipnode,     		           					"
-			+ " \n   'n/a'             AS ReceiptID     	           			"
-			+ " \n FROM yfs_order_header head                 	   				"
-			+ " \n   left outer join yfs_order_hold_type hold          			"
-			+ " \n   on head.order_header_key = hold.order_header_key  			"
-			+ " \n WHERE head.order_no  = '"+ nonDirectShip_search_value +"'   	");
-
-	SQL_MAP.put(
-		ID_UTIL_PRIME_LINE_NUMBER_SQL,
-			" select "
-			+ " \n t1.Line_no,t1.item_id,t1.Description,t1.Qty,t1.List_Price,t1.Price_Each,t1.Total_Price,t3.Fulfillment,t4.TAXPERCENTAGE,t4.tax 														 "
-			+ " \n from (select distinct (ol.prime_line_no) as Line_no,i.item_id,i.description,ol.ordered_qty as QTY,ol.list_price,ol.unit_price as Price_Each,ol.Invoiced_Extended_Price as Total_Price "
-			+ " \n  from sterling.yfs_order_line ol, sterling.yfs_item i                                                                                                                                 "
-			+ " \n where i.item_id=ol.item_id                                                                                                                                                            "
-			+ " \n and ol.order_header_key in (select order_header_key from sterling.yfs_order_header where order_no= '"+ nonDirectShip_search_value +"' ) order by ol.prime_line_no) t1,                "
-			+ " \n (select distinct(ol.prime_line_no) as Line_no, (CASE  WHEN ol.line_type = 'DSV'                                                                                                       "
-			+ " \n                       THEN 'DS'                                                                                                                                                       "
-			+ " \n                       END) as Fulfillment  from sterling.yfs_order_line ol                                                                                                            "
-			+ " \n where ol.order_header_key in (select order_header_key from sterling.yfs_order_header where order_no='"+ nonDirectShip_search_value +"')                                               "
-			+ " \n and ol.line_type='DSV'                                                                                                                                                                "
-			+ " \n order by line_no) t3,                                                                                                                                                                 "
-			+ " \n (select ol.prime_line_no as Line_no,tb.tax_percentage*100 as TAXPERCENTAGE,tb.tax from sterling.yfs_tax_breakup tb, sterling.yfs_order_line ol                                        "
-			+ " \n where tb.header_key =ol.order_header_key                                                                                                                                              "
-			+ " \n and tb.line_key=ol.order_line_key                                                                                                                                                     "
-			+ " \n and tb.header_key in                                                                                                                                                                  "
-			+ " \n (select order_header_key from sterling.yfs_order_header where order_no='"+ nonDirectShip_search_value +"')                                                                            "
-			+ " \n order by prime_line_no) t4                                                                                                                                                            "
-			+ " \n where t1.Line_no=t3.Line_no                                                                                                                                                           "
-			+ " \n and t1.Line_no=t4.Line_no                                                                                                                                                             "
-			+ " \n and t1.Line_no='"+ lineno +"'    																																					 ");
-
-	SQL_MAP.put(
-		ID_UTIL_PRIME_LINE_NUMBER_SQL2,
-			" select t1.Line_no,t1.item_id,t1.Description,t1.Qty,t1.List_Price,t1.Price_Each,t1.Total_Price,t3.Fulfillment,t4.TAXPERCENTAGE,t4.tax															"
-			+ " \n from (select distinct (ol.prime_line_no) as Line_no,i.item_id,i.description,ol.ordered_qty as QTY,ol.list_price,ol.unit_price as Price_Each,ol.Invoiced_Extended_Price as Total_Price    "
-			+ " \n  from sterling.yfs_order_line ol, sterling.yfs_item i                                                                                                                                    "
-			+ " \n where i.item_id=ol.item_id                                                                                                                                                               "
-			+ " \n and ol.order_header_key in (select order_header_key from sterling.yfs_order_header where order_no= '"+ nonDirectShip_search_value +"' ) order by ol.prime_line_no) t1,                   "
-			+ " \n (select t2.Line_no,t2.Fulfillment from (select distinct(ol.prime_line_no) as Line_no, (CASE WHEN s.delivery_method = 'PICK'                                                              "
-			+ " \n                       THEN 'BOPUS'                                                                                                                                                       "
-			+ " \n                       WHEN s.delivery_method = 'SHP'                                                                                                                                     "
-			+ " \n                       THEN 'EFC'                                                                                                                                                         "
-			+ " \n                   END) as Fulfillment  from sterling.yfs_order_line ol,sterling.yfs_shipment_line sl,sterling.yfs_shipment s where                                                       "
-			+ " \n sl.order_line_key=ol.order_line_key                                                                                                                                                      "
-			+ " \n and sl.shipment_key=s.shipment_key                                                                                                                                                       "
-			+ " \n and ol.order_header_key in (select order_header_key from sterling.yfs_order_header where order_no='"+ nonDirectShip_search_value +"')                                                    "
-			+ " \n union                                                                                                                                                                                    "
-			+ " \n select distinct(ol.prime_line_no) as Line_no, (CASE  WHEN ol.line_type = 'DSV'                                                                                                           "
-			+ " \n                       THEN 'DS'                                                                                                                                                          "
-			+ " \n 					  END) as Fulfillment  from sterling.yfs_order_line ol                                                                                                  				"
-			+ " \n where ol.order_header_key in (select order_header_key from sterling.yfs_order_header where order_no='"+ nonDirectShip_search_value +"')                                                  "
-			+ " \n and ol.line_type='DSV') t2                                                                                                                                                               "
-			+ " \n order by t2.line_no) t3,                                                                                                                                                                 "
-			+ " \n (select ol.prime_line_no as Line_no,tb.tax_percentage*100 as TAXPERCENTAGE,tb.tax from sterling.yfs_tax_breakup tb, sterling.yfs_order_line ol                                           "
-			+ " \n where tb.header_key =ol.order_header_key                                                                                                                                                 "
-			+ " \n and tb.line_key=ol.order_line_key                                                                                                                                                        "
-			+ " \n and tb.header_key in                                                                                                                                                                     "
-			+ " \n (select order_header_key from sterling.yfs_order_header where order_no='"+ nonDirectShip_search_value +"')                                                                               "
-			+ " \n order by prime_line_no) t4                                                                                                                                                               "
-			+ " \n where t1.Line_no=t3.Line_no                                                                                                                                                              "
-			+ " \n and t1.Line_no=t4.Line_no 																																								");
-
-	SQL_MAP.put(
-		ID_UTIL_PROMOTION_CODE_SQL,
-			"select p.description as DES,t.CHARGE1 as CHARGE from (select header_key,reference,sum(invoiced_charge_per_line) as CHARGE1 	"
-			+ " from sterling.yfs_line_charges where header_key in 																			"
-			+ " (select order_header_key from sterling.yfs_order_header where order_no ='"+ nonDirectShip_search_value +"') 				"
-			+ " and reference not in (' ')group by header_key,reference)t, sterling.yfs_promotion p 										"
-			+ " where t.header_key=p.order_header_key and t.reference=p.promotion_id														");
-		 */
+		
 		SQL_MAP.put(
 				ID_UTIL_ORDER_INVOICE_SQL,
 				"\n select order_number, order_date, 											"
@@ -442,42 +338,7 @@ public class SQLConstants {
 						+ "\n FROM yfs_Item JOIN yfs_Item_Alias 				"
 						+ "\n ON yfs_item_alias.item_key = yfs_item.item_key	"
 						+ "\n WHERE trim(yfs_item.item_id) = ?					");
-		/*
-	SQL_MAP.put(
-		ID_UTIL_ORDER_STATUS_SQL,
-			"WITH t1 AS                                     "
-			+"  (SELECT a.order_no,                         "
-			+"    a.order_header_key,                       "
-			+"    a.document_type                           "
-			+"  FROM yfs_order_header a                     "
-			+"  WHERE trim(a.order_no) IN (?)			  	"
-			+"  )                                           "
-			+"SELECT t1.order_no,                           "
-			+"  CASE                                        "
-			+"    WHEN MIN(s.STATUS) = '3350.035'           "
-			+"    THEN 'Ready For Customer Pick Up'         "
-			+"    WHEN MIN(s.STATUS) = '3700.2'             "
-			+"    THEN 'Customer Picked Up'                 "
-			+"    WHEN MIN(s.STATUS) = '3700.11'            "
-			+"    THEN 'Expired Pickup'                     "
-			+"    WHEN MIN(s.STATUS) <= 2100                "
-			+"    THEN 'Sourcing'                           "
-			+"    WHEN MIN(s.status) >= 2100                "
-			+"    AND MIN(s.status)   < 3700                "
-			+"    THEN 'In Fulfillment'                     "
-			+"    WHEN MIN(s.status) = 3700                 "
-			+"    THEN 'Shipped'                            "
-			+"    WHEN MIN(s.status) = 9000                 "
-			+"    THEN 'Cancelled'                          "
-			+"    ELSE 'Invoiced'                           "
-			+"  END Status                                  "
-			+"FROM t1                                       "
-			+"JOIN yfs_order_release_status s               "
-			+"ON s.order_header_key   = t1.order_header_key "
-			+"WHERE s.status_quantity > 0                   "
-			+"AND s.status           <> '1400'              "
-			+"GROUP BY t1.order_no			        		");
-		 */
+		
 		SQL_MAP.put(
 				ID_UTIL_SHIPMENT_LINE_DETAILS_SQL,
 				" WITH ship																					"
@@ -1475,14 +1336,6 @@ public class SQLConstants {
 				REPRINT_BOTH_PERSON_SQL,"Select pi.address_line1, pi.city, pi.state, pi.first_name, pi.last_name, pi.day_phone, pi.zip_code, sc.container_scm, oh.order_date, s.requested_carrier_service_code, s.shipnode_key, sc.container_length, sc.container_width, sc.CONTAINER_HEIGHT, sc.actual_weight from yfs_shipment s, yfs_shipment_container sc, yfs_person_info pi, yfs_order_header oh where s.shipment_key = sc.shipment_key  and s.order_header_key = oh.order_header_key and s.to_address_key = pi.person_info_key and sc.container_scm = '");
 		SQL_MAP.put(
 				REPRINT_BOTH_PERSON_SQL2, "select CONSIGNEE_POSTALCODE, CONSIGNEE_COMPANY, SERVICE_LEVEL from proship_container_history h where h.shipping_container_id='" );
-		SQL_MAP.put(
-				ADD_SQL_KEY_SQL, "SELECT LOGGING_SQL_KEY FROM lh_logging_sql ORDER BY LOGGING_SQL_KEY DESC");
-		SQL_MAP.put(
-				ADD_SQL_INSERT_SQL,"INSERT INTO lh_logging_sql (SQL_NAME, RUN_TIME, DESCRIPTION,FUNC_AREA,LOGGING_SQL,SQL_DB,MODEL_IMPL,METRIC)" +
-				" VALUES(");
-
-		SQL_MAP.put(
-				ADD_SQL_INIT_FUNC_SQL,"select distinct func_area from lh_logging_sql");
 
 		SQL_MAP.put(
 				REPRINT_MANUAL_SHIPALONE_SQL, "select unit_length, unit_width, unit_height from yfs_shipment s, yfs_shipment_container sc, yfs_container_details cd, yfs_item i where s.shipment_key = sc.shipment_key and sc.SHIPMENT_CONTAINER_KEY = cd.SHIPMENT_CONTAINER_KEY and i.item_id=cd.item_id and sc.container_scm = '");
