@@ -84,7 +84,8 @@ public class StoreElfJndiLdapRealm extends JndiLdapRealm{
 		AuthenticationInfo info = null;
  
 		//Skip Login authentication (i.e. create generic session)
-		if(turnOffLogin){
+		/////if(turnOffLogin){
+		if(true){
 			logger.debug("No Ldap validation enabled, creating generic session");
 			return createAuthenticationInfo(token, principal, null, null);
 		}
