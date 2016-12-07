@@ -114,7 +114,7 @@ public class StoreElfRolePermissionResolver implements RolePermissionResolver, o
 			if (con != null) {
 				stmnt = con.createStatement();
 				result = stmnt.executeQuery(
-						"SELECT up.section, up.function, up.servlet_uri FROM storeelf.lh_user_roles r, storeelf.lh_user_role_list rl, storeelf.lh_user_permissions up WHERE rl.user_permission_key = up.user_permission_key AND rl.user_role_key = r.user_role_key AND r.name = '"
+						"SELECT up.section, up.function, up.servlet_uri FROM se_user_roles r, se_user_role_list rl, se_user_permissions up WHERE rl.user_permission_key = up.user_permission_key AND rl.user_role_key = r.user_role_key AND r.name = '"
 								+ pRoleName + "'");
 
 				String section, function, servlet_uri = "-";

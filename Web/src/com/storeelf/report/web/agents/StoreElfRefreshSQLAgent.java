@@ -85,7 +85,7 @@ public class StoreElfRefreshSQLAgent extends Thread {
 
 					//ONLY refresh if the job is marked as Scheduled, Waiting or Done !
 					if(useFilterflag){
-						SQL_ID_MATCHES = (SQLID.startsWith("LH_") || SQLID.startsWith(SQLID_PREFIX_FILTER)) && (SQLID_STATUS.equals("SCHEDULED") || SQLID_STATUS.equals("WAITING") || SQLID_STATUS.equals("DONE") || SQLID_STATUS.equals("FORCE") || SQLID_STATUS.equals("ERROR") ); 
+						SQL_ID_MATCHES = (SQLID.startsWith("SE_") || SQLID.startsWith(SQLID_PREFIX_FILTER)) && (SQLID_STATUS.equals("SCHEDULED") || SQLID_STATUS.equals("WAITING") || SQLID_STATUS.equals("DONE") || SQLID_STATUS.equals("FORCE") || SQLID_STATUS.equals("ERROR") ); 
 					}else{
 						SQL_ID_MATCHES = (SQLID_STATUS.equals("SCHEDULED") || SQLID_STATUS.equals("WAITING") || SQLID_STATUS.equals("DONE") || SQLID_STATUS.equals("FORCE") ||SQLID_STATUS.equals("ERROR") ); 
 					}
