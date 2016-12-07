@@ -51,7 +51,7 @@ function setTime()
             </div>
 
 			<!--logo start-->
-			<a href="#" class="logo">Log<span>Hub</span></a>
+			<a href="#" class="logo">Store<span>Elf</span></a>
  
 			<div class="horizontal-menu navbar-collapse collapse ">
                   <ul class="nav navbar-nav">
@@ -66,20 +66,7 @@ function setTime()
 							</shiro:hasRole>
 						</li>
 					</shiro:hasPermission>
-					
-                  	<%-- <shiro:hasPermission name="dashboard:read:*:*">
-                     	 <li><a href="/Dashboard/StoreElfComMetrics/quick_metrics_visuals"><i class="fa fa-dashboard"></i><div class="headTitle">Dashboard</div></a>
-	                      	 <shiro:hasRole name="Administrator">
-	                      	 <ul class="dropdown-menu" style="top:75px">
-	                      	 	<li><a href="/Dashboard/ServerStatistics/SQL_thread_status">Dashboard SQL Thread Status</a></li>
-	                      	 </ul>
-	                      	</shiro:hasRole>
-                     	 </li>
-                    </shiro:hasPermission> --%>
-		           <%--  <shiro:hasPermission name="dashboard:read:*:*">
-		            	<li><a href="/Dashboard/StoreElfComMetrics/quick_metrics_visuals"><i class="fa fa-dashboard"></i><div class="headTitle"> Dashboard</div></a></li>
-		            </shiro:hasPermission> --%>
-		            <shiro:hasPermission name="report:read:*:*"> <li><a href="/Report/Report/reports#/Filter?group=Daily&type=DailyShippedUnitsReport"><i class="fa fa-folder-open"></i><div class="headTitle"> View Reports</div></a></li></shiro:hasPermission>
+
 		             <li class="dropdown">
                           <a  data-hover="dropdown" id="tester" href="/Utility/OrderManagement/item"><i class="fa fa-briefcase"></i><div class="headTitle"> Utility <b class=" fa fa-angle-down"></b></div></a>
                           <ul class="dropdown-menu">                         
@@ -108,58 +95,9 @@ function setTime()
 		                          </ul>
 	                         </li>
 	                         </shiro:hasPermission>
-	                         
-	                         <shiro:hasPermission name="utility:read:WarehouseTransfer:*">
-	                         	<li><a href="/Utility/WarehouseTransfer/transfer_orders">Warehouse Transfer</a></li>
-	                         </shiro:hasPermission>
-	                         
-	                         <shiro:hasPermission name="utility:read:WarehouseManagement:*">
-	                         	 <li class ="subItem"><a href="/Utility/WarehouseManagement/distribution_order_detail">Warehouse Management</a>
-	                         	 	<ul class="dropdown-menu" style="top:50px">
-	                      				<!--  Commenting untill we figure out the table for 2012 version -->
-	<%--                          	 		<li><a href="/Utility/WarehouseManagement/ship_via">Ship Via</a></li> --%>
-										<!-- Pickticket Detail name has been changed to Distribution Order Detail -->
-										<li><a href="/Utility/WarehouseManagement/distribution_order_detail">Distribution Order Detail</a></li>
-										<li><a href="/Utility/WarehouseManagement/collate_print_times">Collate Print Times</a></li>
-										<li><a href="/Utility/WarehouseManagement/ship_via">Ship Via</a></li>
-										<!-- Carton Detail name has been changed to LPN Detail -->
-										<li><a href="/Utility/WarehouseManagement/lpn_detail">LPN Detail</a></li>
-										<li><a href="/Utility/WarehouseManagement/task_detail">Task Detail</a></li>
-										<li><a href="/Utility/WarehouseManagement/proship_container_lookup">Proship Container Lookup</a></li>
-								        <!-- <li><a href="/Pace/Audit/ptt_audit_system">PTT Audit System</a></li> -->
-	                         	 	</ul>
-	                         	 </li>
-	                         </shiro:hasPermission>
-	                         
-	                         <shiro:hasPermission name="utility:read:SourcingDetail:*">
-                         	 <li class ="subItem"><a href="/Utility/SourcingDetail/sourcing_unit_capacity">Sourcing Detail</a>
-	                         	 <ul class="dropdown-menu" style="top:75px">
-	                         	 	<li><a href="/Utility/SourcingDetail/sourcing_unit_capacity">Store Unit Capacity</a></li>
-									<li><a href="/Utility/SourcingDetail/sourcing_rule_details">Sourcing Rule Details</a></li>
-									<li><a href="/Utility/SourcingDetail/distribution_group_details">Distribution Group Details</a></li>
-	                         	 </ul>
-                         	 </li>
-                         	 </shiro:hasPermission>
-                         	 
-                         	 <shiro:hasPermission name="utility:read:AdminFunctions:*">
-                         	 <li class ="subItem"><a>Admin Functions</a>
-	                         	 <ul class="dropdown-menu" style="top:125px">
-	                         	 	
-	                         	 	<li><a href="/Utility/AdminFunctions/reprint_label">Reprint Label</a></li>
-	                         	 	
-	                         	 	<li><a href="/Utility/AdminFunctions/order_cancel">Order Cancel</a></li>
-	                         	 </ul>
-                         	 </li>
-                         	 </shiro:hasPermission>
                          	 
                           </ul>
                       </li>
-                      
-                      <li><a href="/Management/BusinessManagement/item_attribute"><i class="fa fa-bolt"></i> <div class="headTitle">Management</div></a></li>
-                      
-                      <shiro:hasPermission name="environment:read:*:*">
-		             	<li><a href="/Environment/ServerStatistics/app"><i class="fa fa-cogs"></i><div class="headTitle"> Environment</div></a></li>
-		             </shiro:hasPermission>
 					
 					<shiro:hasPermission name="security:read:*:*">		            			
 						<li class="dropdown">
@@ -172,13 +110,6 @@ function setTime()
 							</ul>
 						</li>
 					</shiro:hasPermission>
-						<li class="dropdown">
-							<a  data-hover="dropdown" id="tester" href="/Logging/LoggingStatistics/splunk_quickview"><i class="fa fa-table"></i><div class="headTitle">Logging <b class=" fa fa-angle-down"></b></div></a>
-							<ul class="dropdown-menu">
-								<li class="subItem"><a href="/Logging/LoggingStatistics/SQL_thread_status">SQL Thread Status</a></li>	
-								<li class="subItem"><a href="/Logging/LoggingStatistics/splunk_quickview">Splunk Quickview</a></li>		
-							</ul>
-						</li>
 					
 		            <shiro:hasPermission name="help:read:*:*">
 		            	<li><a href="/Help"><i class="fa fa-question-circle"></i><div class="headTitle"> Help</div></a></li>

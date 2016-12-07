@@ -83,7 +83,7 @@
 				<!--HEADER-->
 				<div class="header">
 					<!--TITLE-->
-					<h1 class="logo">Log<span>Hub</span></h1>
+					<h1 class="logo">Store<span>Elf</span></h1>
 					<!--END TITLE-->
 				</div>
 				<!--END HEADER-->
