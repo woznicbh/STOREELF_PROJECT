@@ -131,11 +131,12 @@ public class ReportActivator {
 		logger.debug("com.storeelf.report.web.init.ReportActivator::getConnection");
 		try{
 
-			return this.reportDBMap.get(instance).getNewConnection();
+			//return this.reportDBMap.get(instance).getNewConnection();
+			return null;
 		
 		}
-		catch(SQLException e)			{logger.error("Could not establish connection to instance:"+instance, e);}
-		catch(ClassNotFoundException e)	{logger.error("Could not establish connection to instance:"+instance, e);}
+		//catch(SQLException e)			{logger.error("Could not establish connection to instance:"+instance, e);}
+		//catch(ClassNotFoundException e)	{logger.error("Could not establish connection to instance:"+instance, e);}
 		catch(Exception e)				{logger.error("Could not establish connection to instance:"+instance, e);}
 		return null;
 	}
