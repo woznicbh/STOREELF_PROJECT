@@ -1,3 +1,4 @@
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
 /*function TimeCtrl($scope, $timeout) {
     $scope.clock = "loading clock..."; // initialise the time variable
