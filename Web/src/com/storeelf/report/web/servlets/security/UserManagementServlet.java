@@ -59,7 +59,7 @@ public void usermanagement(String requestedPage,
 							Constants.STOREELF_RO);
 
 					sql = " SELECT USERNAME AS USERID, FIRST_NAME, LAST_NAME, IS_ADMIN "
-							+ "\n FROM STOREELF.LH_USER ";
+							+ "\n FROM STOREELF.SE_USER ";
 
 					if (!com.storeelf.util.StringUtils.isVoid(user_id))
 						sql += "WHERE USERNAME  LIKE '%" + user_id + "%'";
@@ -127,7 +127,7 @@ public void usermanagement(String requestedPage,
 
 					con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "\n INSERT INTO storeelf.lh_user (USERNAME,FIRST_NAME,LAST_NAME, IS_ADMIN, ACTIVE, CREATETS, MODIFYTS) "
+					sql = "\n INSERT INTO storeelf.se_user (USERNAME,FIRST_NAME,LAST_NAME, IS_ADMIN, ACTIVE, CREATETS, MODIFYTS) "
 							+ " \n VALUES ('" + userID + "','" + firstName + "','" + lastName
 							+ "', 'N', 'N', NOW(), NOW())";
 
@@ -189,7 +189,7 @@ public void usermanagement(String requestedPage,
 
 					con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "\n INSERT INTO storeelf.lh_user (USERNAME,FIRST_NAME,LAST_NAME, IS_ADMIN, ACTIVE, CREATETS, MODIFYTS) "
+					sql = "\n INSERT INTO storeelf.se_user (USERNAME,FIRST_NAME,LAST_NAME, IS_ADMIN, ACTIVE, CREATETS, MODIFYTS) "
 							+ " \n VALUES ('" + userID + "','" + firstName + "','" + lastName
 							+ "', 'N', 'N', NOW(), NOW())";
 
@@ -243,8 +243,8 @@ public void groupDetails_popup(String requestedPage, HttpServletRequest request,
 				userID			= userID.trim();
 				con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "SELECT '"+ userID +"' as username, ug.name, ug.user_group_key, ug.description, ug.default_landing_page_uri, (select count(*) from storeelf.lh_user_group_list gl where gl.user_group_key = ug.user_group_key and gl.username='"+ userID +"' ) as IS_ASSIGNED"
-						  + " \n	FROM storeelf.lh_user_group ug";
+					sql = "SELECT '"+ userID +"' as username, ug.name, ug.user_group_key, ug.description, ug.default_landing_page_uri, (select count(*) from storeelf.se_user_group_list gl where gl.user_group_key = ug.user_group_key and gl.username='"+ userID +"' ) as IS_ASSIGNED"
+						  + " \n	FROM storeelf.se_user_group ug";
 					
 				logger.debug("sql query is: " + sql);
 				ConcurrentHashMap<Integer, HashMap<String, Object>> result = SQLUtils
@@ -291,7 +291,7 @@ public void assignGroups(String requestedPage,
 				
 				con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 				
-				sql="INSERT INTO `storeelf`.`lh_user_group_list` (`user_group_key`,`username`,`createts`,`modifyts`,`createusername`,`modifyusername`)"
+				sql="INSERT INTO `storeelf`.`se_user_group_list` (`user_group_key`,`username`,`createts`,`modifyts`,`createusername`,`modifyusername`)"
 						+ "VALUES ('"+user_group_key+"', '"+username+"', NOW(), NOW(), '"+currentuser+"', '"+currentuser+"')";
 					
 				logger.debug("sql query is: " + sql); 
@@ -353,7 +353,7 @@ public void unassignGroups(String requestedPage,
 				user_group_key	= user_group_key.trim();
 				con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-				sql = "DELETE from storeelf.lh_user_group_list where username = '"+username+"' AND user_group_key = '"+user_group_key+"'";
+				sql = "DELETE from storeelf.se_user_group_list where username = '"+username+"' AND user_group_key = '"+user_group_key+"'";
 					
 				logger.debug("sql query is: " + sql); 
 				stmt	= con.createStatement();
@@ -408,7 +408,7 @@ public void unassignGroups(String requestedPage,
 					userID = userID.trim();
 					con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "\n DELETE FROM storeelf.lh_user WHERE username = '" + userID + "'";
+					sql = "\n DELETE FROM storeelf.se_user WHERE username = '" + userID + "'";
 
 					logger.debug("sql query is: " + sql);
 					stmt = con.createStatement();
@@ -454,7 +454,7 @@ public void getUserDropdown(String requestedPage,HttpServletRequest request, Htt
 			response.setContentType("application/json");
 
 				con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
-				sql = "SELECT NAME FROM STOREELF.LH_USER_GROUP";
+				sql = "SELECT NAME FROM STOREELF.SE_USER_GROUP";
 				ConcurrentHashMap<Integer, HashMap<String, Object>> result = SQLUtils
 						.getSQLResult(sql, con);
 				Gson gson = new GsonBuilder().create();

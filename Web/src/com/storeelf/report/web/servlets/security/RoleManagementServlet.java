@@ -67,7 +67,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 							Constants.STOREELF_RO);
 
 					sql = " SELECT USER_ROLE_KEY,NAME, DESCRIPTION, CREATEUSERNAME "
-							+ "\n FROM STOREELF.LH_USER_ROLES ";
+							+ "\n FROM STOREELF.SE_USER_ROLES ";
 
 					
 					 if (!com.storeelf.util.StringUtils.isVoid(user_role))
@@ -140,7 +140,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					con = ReportActivator.getInstance().getConnection(
 							Constants.STOREELF_RO);
 
-					 sqlUpdate = " UPDATE  STOREELF.LH_USER_ROLES SET NAME='" + user_role + "'WHERE USER_ROLE_KEY  = '" + role_id + "'";
+					 sqlUpdate = " UPDATE  STOREELF.SE_USER_ROLES SET NAME='" + user_role + "'WHERE USER_ROLE_KEY  = '" + role_id + "'";
 					 logger.debug("sql query is: " + sqlUpdate);
 //				ConcurrentHashMap<Integer, HashMap<String, Object>>; 
 				
@@ -214,7 +214,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					con = ReportActivator.getInstance().getConnection(
 							Constants.STOREELF_RO);
 
-					sql = "SELECT USER_ROLE_KEY,NAME FROM STOREELF.LH_USER_ROLES ";
+					sql = "SELECT USER_ROLE_KEY,NAME FROM STOREELF.SE_USER_ROLES ";
 							
 					ConcurrentHashMap<Integer, HashMap<String, Object>> result = SQLUtils
 							.getSQLResult(sql, con);
@@ -277,7 +277,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-						sql = "\n INSERT INTO storeelf.lh_user_roles (name,description,servlet_uri, is_active, is_admin, permission_1, createts,modifyts,createusername,modifyusername) "
+						sql = "\n INSERT INTO storeelf.se_user_roles (name,description,servlet_uri, is_active, is_admin, permission_1, createts,modifyts,createusername,modifyusername) "
 								+ " \n VALUES ('"
 								
 								+ userRole
@@ -350,7 +350,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					con = ReportActivator.getInstance().getConnection(
 							Constants.STOREELF_RO);
 
-					 sqlUpdate = " DELETE FROM  STOREELF.LH_USER_ROLES WHERE USER_ROLE_KEY  = '" + role_id + "'";
+					 sqlUpdate = " DELETE FROM  STOREELF.SE_USER_ROLES WHERE USER_ROLE_KEY  = '" + role_id + "'";
 					 logger.debug("sql query is: " + sqlUpdate);
 //				ConcurrentHashMap<Integer, HashMap<String, Object>>; 
 				
@@ -422,9 +422,9 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 				con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 				
 				if(StringUtils.isNotBlank(user_role_key) && !StringUtils.equals(user_role_key, "null")){
-					sql = "SELECT USER_PERMISSION_KEY,SECTION,FUNCTION, SERVLET_URI, (select count(*) from storeelf.lh_user_roles r join storeelf.lh_user_role_list rl on rl.user_role_key = r.user_role_key join storeelf.lh_user_permissions up on rl.user_permission_key = up.user_permission_key where up.user_permission_key = lhup.user_permission_key  AND r.user_role_key = '"+user_role_key+"') as has_permission FROM STOREELF.LH_USER_PERMISSIONS lhup";
+					sql = "SELECT USER_PERMISSION_KEY,SECTION,FUNCTION, SERVLET_URI, (select count(*) from storeelf.se_user_roles r join storeelf.se_user_role_list rl on rl.user_role_key = r.user_role_key join storeelf.se_user_permissions up on rl.user_permission_key = up.user_permission_key where up.user_permission_key = lhup.user_permission_key  AND r.user_role_key = '"+user_role_key+"') as has_permission FROM STOREELF.SE_USER_PERMISSIONS lhup";
 				}else{
-					sql = " SELECT USER_PERMISSION_KEY,SECTION, FUNCTION, SERVLET_URI FROM STOREELF.LH_USER_PERMISSIONS ";	
+					sql = " SELECT USER_PERMISSION_KEY,SECTION, FUNCTION, SERVLET_URI FROM STOREELF.SE_USER_PERMISSIONS ";	
 				}				
 				
 				ConcurrentHashMap<Integer, HashMap<String, Object>> result = SQLUtils.getSQLResult(sql, con);
@@ -596,7 +596,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-						sql = "\n INSERT INTO storeelf.lh_user_permissions (section,function,servlet_uri,createts,modifyts) "
+						sql = "\n INSERT INTO storeelf.se_user_permissions (section,function,servlet_uri,createts,modifyts) "
 								+ " \n VALUES ('"
 								
 								+ StringUtils.lowerCase(section)
@@ -678,7 +678,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "\n INSERT INTO storeelf.lh_user_role_list (`user_role_key`, `user_permission_key`, `createts`,`modifyts`,`createusername`,`modifyusername`) "
+					sql = "\n INSERT INTO storeelf.se_user_role_list (`user_role_key`, `user_permission_key`, `createts`,`modifyts`,`createusername`,`modifyusername`) "
 						+ " \n VALUES ('"+ user_role_key+ "','"+ user_permission_key+ "',NOW(), NOW(),'"+currentuser+"','"+currentuser+"')";
 						
 					logger.debug("sql query is: " + sql); 
@@ -743,7 +743,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "DELETE from storeelf.lh_user_role_list where user_role_key = '"+user_role_key+"' AND user_permission_key = '"+user_permission_key+"'";
+					sql = "DELETE from storeelf.se_user_role_list where user_role_key = '"+user_role_key+"' AND user_permission_key = '"+user_permission_key+"'";
 						//+ " \n VALUES ('"+ user_role_key+ "','"+ user_permission_key+ "',NOW(), NOW(),'"+currentuser+"',"+currentuser+")";
 						
 					logger.debug("sql query is: " + sql); 
@@ -810,7 +810,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "select user_role_key,user_permission_key from storeelf.lh_user_role_list where user_role_key = '"+user_role_key+"' AND user_permission_key = '"+user_permission_key+"'";
+					sql = "select user_role_key,user_permission_key from storeelf.se_user_role_list where user_role_key = '"+user_role_key+"' AND user_permission_key = '"+user_permission_key+"'";
 					ConcurrentHashMap<Integer, HashMap<String, Object>> result = SQLUtils.getSQLResult(sql, con);
 
 					logger.debug("sql query is: " + sql);
@@ -866,7 +866,7 @@ public class RoleManagementServlet extends StoreElfHttpServlet<Object> {
 					con = ReportActivator.getInstance().getConnection(
 							Constants.STOREELF_RO);
 
-					 sqlUpdate = " DELETE FROM  STOREELF.LH_USER_PERMISSIONS WHERE USER_PERMISSION_KEY  = '" + permissionkey + "'";
+					 sqlUpdate = " DELETE FROM  STOREELF.SE_USER_PERMISSIONS WHERE USER_PERMISSION_KEY  = '" + permissionkey + "'";
 					 logger.debug("sql query is: " + sqlUpdate);
 //				ConcurrentHashMap<Integer, HashMap<String, Object>>; 
 				

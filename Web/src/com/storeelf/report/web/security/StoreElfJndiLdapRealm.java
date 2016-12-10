@@ -84,7 +84,9 @@ public class StoreElfJndiLdapRealm extends JndiLdapRealm{
 		AuthenticationInfo info = null;
  
 		//Skip Login authentication (i.e. create generic session)
+
 		//if(turnOffLogin){
+
 		if(true){
 			logger.debug("No Ldap validation enabled, creating generic session");
 			return createAuthenticationInfo(token, principal, null, null);
@@ -203,7 +205,7 @@ public class StoreElfJndiLdapRealm extends JndiLdapRealm{
 				
 				if(con!=null){
 					String sql = "SELECT grl.user_role_key, r.name"
-							+ " FROM storeelf.lh_user_group_list gl, storeelf.lh_user_group_role_list grl, storeelf.lh_user_roles r "
+							+ " FROM se_user_group_list gl, se_user_group_role_list grl, se_user_roles r "
 							+ " WHERE gl.username = '"+username+"' and gl.user_group_key = grl.user_group_key and grl.user_role_key = r.user_role_key";
 									
 					ConcurrentHashMap<Integer, HashMap<String, Object>> result = SQLUtils.getSQLResult(sql, con);

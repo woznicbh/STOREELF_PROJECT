@@ -236,7 +236,7 @@ public class StoreElfContextListener implements ServletContextListener {
 						
 						
 			if(isMFDatacenter){
-				//if(ping("10.7.32.22",2000)){
+				
 					wanTargetClusterConfig.setGroupName("gt-storeelf-session-group");
 					wanTargetClusterConfig.setGroupPassword("GT_STOREELF_SESSION_GROUP_PASSWORD");
 					wanTargetClusterConfig.setReplicationImpl("com.hazelcast.wan.impl.WanNoDelayReplication");
@@ -245,9 +245,9 @@ public class StoreElfContextListener implements ServletContextListener {
 					wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5702");
 					wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5703");
 					wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5704");
-					wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5705");
+					
 			}else if(isGTDatacenter){
-				//if(ping("10.1.31.81",2000)){	
+				
 					wanTargetClusterConfig.setGroupName("mf-storeelf-session-group");
 					wanTargetClusterConfig.setGroupPassword("MF_STOREELF_SESSION_GROUP_PASSWORD");
 					wanTargetClusterConfig.setReplicationImpl("com.hazelcast.wan.impl.WanNoDelayReplication");
@@ -256,14 +256,9 @@ public class StoreElfContextListener implements ServletContextListener {
 					wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5702");
 					wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5703");
 					wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5704");
-					wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5705");
-					//wanReplicationConfig.addTargetClusterConfig(wanTargetClusterConfig);
-//				}else{
-//					logger.error("could not reach GT host 10.7.32.22");
-//				}
+					
 			}else{
-				//int pingCount = 0;
-				//if(ping("10.7.32.22",2000)){
+				
 					gt_wanTargetClusterConfig = new WanTargetClusterConfig();
 					gt_wanTargetClusterConfig.setGroupName("gt-storeelf-session-group");
 					gt_wanTargetClusterConfig.setGroupPassword("GT_STOREELF_SESSION_GROUP_PASSWORD");
@@ -273,13 +268,7 @@ public class StoreElfContextListener implements ServletContextListener {
 					gt_wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5702");
 					gt_wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5703");
 					gt_wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5704");
-					gt_wanTargetClusterConfig.getEndpoints().add("10.7.32.22:5705");
-					//wanReplicationConfig.addTargetClusterConfig(gt_wanTargetClusterConfig);
-//				}else{
-//					logger.error("could not reach GT host 10.7.32.22");
-//				}
-				
-				//if(ping("10.1.31.81",2000)){
+					
 					mf_wanTargetClusterConfig = new WanTargetClusterConfig();
 					mf_wanTargetClusterConfig.setGroupName("mf-storeelf-session-group");
 					mf_wanTargetClusterConfig.setGroupPassword("MF_STOREELF_SESSION_GROUP_PASSWORD");
@@ -289,13 +278,7 @@ public class StoreElfContextListener implements ServletContextListener {
 					mf_wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5702");
 					mf_wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5703");
 					mf_wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5704");
-					mf_wanTargetClusterConfig.getEndpoints().add("10.1.31.81:5705");
-					//wanReplicationConfig.addTargetClusterConfig(mf_wanTargetClusterConfig);
-					
-//				}else{
-//					logger.error("could not reach MF host 10.1.31.81");
-//				}
-				
+									
 			} 
 			
 			if(Constants.STOREELF_HZ_WAN_REPLICATION==true){									

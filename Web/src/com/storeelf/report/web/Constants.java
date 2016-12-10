@@ -694,8 +694,8 @@ public class Constants{
 		DSV_MAP.put(REPORT_GROUPED_FULFILLMENT_STAT_HOURLY,					REPORT_MAP.get(REPORT_GROUPED_FULFILLMENT_STAT_HOURLY));
 	}
 	
-	public static String ID_LH_MYSQL_ROLES								= "LH_Role_Map";
-	public static String ID_LH_MYSQL_ROLE_PERMS							= "LH_Role_Permission_Map";
+	public static String ID_SE_MYSQL_ROLES								= "SE_Role_Map";
+	public static String ID_SE_MYSQL_ROLE_PERMS							= "SE_Role_Permission_Map";
 	
 	/* MAPS and VARIABLES for creating the SQLS in the Report Screen */
 	public static String ID_7_DAY_FNCL_OVRVW							= "QM_7_Day_Financial_Overview";
@@ -1041,8 +1041,8 @@ public class Constants{
 	public static TreeMap<String, String> SQL_MODEL_MAP = new TreeMap<String, String>();
 	static {
 		
-		SQL_MODEL_MAP.put(ID_LH_MYSQL_ROLES, "com.storeelf.report.web.model.impl.MultiColumnModal");
-		SQL_MODEL_MAP.put(ID_LH_MYSQL_ROLE_PERMS, "com.storeelf.report.web.model.impl.MultiColumnModal");
+		SQL_MODEL_MAP.put(ID_SE_MYSQL_ROLES, "com.storeelf.report.web.model.impl.MultiColumnModal");
+		SQL_MODEL_MAP.put(ID_SE_MYSQL_ROLE_PERMS, "com.storeelf.report.web.model.impl.MultiColumnModal");
 		
 		SQL_MODEL_MAP.put(ID_7_DAY_FNCL_OVRVW, "com.storeelf.report.web.model.impl.MultiColumnModal");
 		
@@ -1324,8 +1324,8 @@ public class Constants{
 
 	public static TreeMap<String, Long> SQL_TIME_MAP = new TreeMap<String, Long>();
 	static {
-		SQL_TIME_MAP.put(ID_LH_MYSQL_ROLES, Long.valueOf(30000));
-		SQL_TIME_MAP.put(ID_LH_MYSQL_ROLE_PERMS, Long.valueOf(30000));
+		SQL_TIME_MAP.put(ID_SE_MYSQL_ROLES, Long.valueOf(30000));
+		SQL_TIME_MAP.put(ID_SE_MYSQL_ROLE_PERMS, Long.valueOf(30000));
 		
 		SQL_TIME_MAP.put(ID_7_DAY_FNCL_OVRVW, Long.valueOf(900000));
 		
@@ -2008,8 +2008,8 @@ public class Constants{
 
 	public static TreeMap<String, String> SQL_DESC = new TreeMap<String, String>();
 	static {
-		SQL_DESC.put(ID_LH_MYSQL_ROLES, "StoreElf User Roles");
-		SQL_DESC.put(ID_LH_MYSQL_ROLE_PERMS, "StoreElf Role Permissions");
+		SQL_DESC.put(ID_SE_MYSQL_ROLES, "StoreElf User Roles");
+		SQL_DESC.put(ID_SE_MYSQL_ROLE_PERMS, "StoreElf Role Permissions");
 		
 		SQL_DESC.put(ID_7_DAY_FNCL_OVRVW, "7 Day Financial Overview");
 		SQL_DESC.put(ID_ODR_FRM, "Total Order Count Today");
@@ -2152,8 +2152,8 @@ public class Constants{
 	public static TreeMap<String, String> SQL_INST = new TreeMap<String, String>();
 	static {
 		
-		SQL_INST.put(ID_LH_MYSQL_ROLES, STOREELF_RO);
-		SQL_INST.put(ID_LH_MYSQL_ROLE_PERMS, STOREELF_RO);
+		SQL_INST.put(ID_SE_MYSQL_ROLES, STOREELF_RO);
+		SQL_INST.put(ID_SE_MYSQL_ROLE_PERMS, STOREELF_RO);
 
 		SQL_INST.put(ID_7_DAY_FNCL_OVRVW,OMS);
 		SQL_INST.put(ID_ODR_FRM, OMS);

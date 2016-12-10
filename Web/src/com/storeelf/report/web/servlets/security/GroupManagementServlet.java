@@ -59,7 +59,7 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 							Constants.STOREELF_RO);
 
 					sql = " SELECT user_group_key AS GROUPKEY, NAME, DESCRIPTION, IS_ACTIVE, DEFAULT_LANDING_PAGE_URI, CREATETS, MODIFYTS, CREATEUSERNAME, MODIFYUSERNAME "
-							+ "\n FROM STOREELF.lh_user_group ";
+							+ "\n FROM STOREELF.se_user_group ";
 
 					if (!com.storeelf.util.StringUtils.isVoid(groupDesc))
 						sql += "WHERE DESCRIPTION  LIKE '%" + groupDesc + "%'";
@@ -126,7 +126,7 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-						sql = "\n INSERT INTO storeelf.lh_user_group ( name, description, is_active, default_landing_page_uri, CREATETS, MODIFYTS) "
+						sql = "\n INSERT INTO storeelf.se_user_group ( name, description, is_active, default_landing_page_uri, CREATETS, MODIFYTS) "
 								+ " \n VALUES ('"
 								
 								+ groupName
@@ -192,7 +192,7 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 					con = ReportActivator.getInstance().getConnection(
 							Constants.STOREELF_RO);
 
-					sqlDel = " DELETE FROM  STOREELF.LH_USER_GROUP WHERE USER_GROUP_KEY  = '" + groupkey + "'";
+					sqlDel = " DELETE FROM  STOREELF.SE_USER_GROUP WHERE USER_GROUP_KEY  = '" + groupkey + "'";
 					 logger.debug("sql query is: " + sqlDel);
 //				ConcurrentHashMap<Integer, HashMap<String, Object>>; 
 				
@@ -273,7 +273,7 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 					con = ReportActivator.getInstance().getConnection(
 							Constants.STOREELF_RO);
 
-					 sqlUpdate = " UPDATE  STOREELF.lh_user_group SET NAME='" + groupname + "', DESCRIPTION='" + groupdesc + "' WHERE USER_GROUP_KEY  = '" + groupkey + "'";
+					 sqlUpdate = " UPDATE  STOREELF.se_user_group SET NAME='" + groupname + "', DESCRIPTION='" + groupdesc + "' WHERE USER_GROUP_KEY  = '" + groupkey + "'";
 					 logger.debug("sql query is: " + sqlUpdate);
 //				ConcurrentHashMap<Integer, HashMap<String, Object>>; 
 				
@@ -351,9 +351,9 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 					
-					sql="INSERT INTO `storeelf`.`lh_user_group_role_list` (`user_group_key`,`user_role_key`,`createts`,`modifyts`,`createusername`,`modifyusername`)"
+					sql="INSERT INTO `storeelf`.`se_user_group_role_list` (`user_group_key`,`user_role_key`,`createts`,`modifyts`,`createusername`,`modifyusername`)"
 							+ "VALUES ('"+user_group_key+"', '"+user_role_key+"', NOW(), NOW(), '"+currentuser+"', '"+currentuser+"')";
-					//sql = "UPDATE `storeelf`.`lh_user_roles` SET `user_group_key` = '123456789', `modifyts` = '2015-01-07 15:55:40', `modifyusername` = 'TKMAGH4' WHERE `user_role_key` = '987654321';";
+					//sql = "UPDATE `storeelf`.`se_user_roles` SET `user_group_key` = '123456789', `modifyts` = '2015-01-07 15:55:40', `modifyusername` = 'TKMAGH4' WHERE `user_role_key` = '987654321';";
 						
 					logger.debug("sql query is: " + sql); 
 					stmt	= con.createStatement();
@@ -415,7 +415,7 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 					
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-					sql = "DELETE from storeelf.lh_user_group_role_list where user_role_key = '"+user_role_key+"' AND user_group_key = '"+user_group_key+"'";
+					sql = "DELETE from storeelf.se_user_group_role_list where user_role_key = '"+user_role_key+"' AND user_group_key = '"+user_group_key+"'";
 						
 					logger.debug("sql query is: " + sql); 
 					stmt	= con.createStatement();
@@ -471,8 +471,8 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 					groupKey			= groupKey.trim();
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 
-						sql = "select first_name, last_name, username from storeelf.lh_user where username in (SELECT  ugl.username"
-							  + " \n	FROM storeelf.lh_user_group_list ugl, storeelf.lh_user_group ug		  "
+						sql = "select first_name, last_name, username from storeelf.se_user where username in (SELECT  ugl.username"
+							  + " \n	FROM storeelf.se_user_group_list ugl, storeelf.se_user_group ug		  "
 							  + " \n	WHERE ugl.user_group_key = ug.user_group_key and ug.user_group_key = "+ groupKey +")" ;
 
 					logger.debug("sql query is: " + sql);
@@ -514,8 +514,8 @@ public class GroupManagementServlet extends StoreElfHttpServlet<Object>{
 					con				= ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
 					
 					sql = "SELECT '"+ groupKey +"' as user_group_key, r.user_role_key, r.name, r.description as role_description, "
-							+ "(select count(*) from storeelf.lh_user_group_role_list grl where grl.user_role_key = r.user_role_key and grl.user_group_key = '"+ groupKey +"') as IS_ASSIGNED"
-							+ " FROM storeelf.lh_user_roles r";
+							+ "(select count(*) from storeelf.se_user_group_role_list grl where grl.user_role_key = r.user_role_key and grl.user_group_key = '"+ groupKey +"') as IS_ASSIGNED"
+							+ " FROM storeelf.se_user_roles r";
 						
 						logger.debug("sql query is: " + sql);
 					ConcurrentHashMap<Integer, HashMap<String, Object>> result = SQLUtils

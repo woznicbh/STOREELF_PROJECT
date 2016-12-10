@@ -2,7 +2,7 @@
 --#	Create User:
 --###
 INSERT INTO
-`storeelf`.`lh_user`
+`storeelf`.`se_user`
 (`username`,`password`,`first_name`,`last_name`,`profile_id`,`is_admin`,`active`,`last_login_ts`,`default_landing_page_uri`,`createts`,`modifyts`,`createusername`,`modifyusername`)
 VALUES ('TKMAGH4','123','Nijee','Taylor','TKMAGH4','Y','Y','2015-01-07 15:55:40','/Logistics/v2','2015-01-07 15:55:40','2015-01-07 15:55:40','admin','admin');
 
@@ -10,21 +10,21 @@ VALUES ('TKMAGH4','123','Nijee','Taylor','TKMAGH4','Y','Y','2015-01-07 15:55:40'
 --#	Create Group:
 --###
 INSERT INTO
-`storeelf`.`lh_user_group`
+`storeelf`.`se_user_group`
 (`name`,`description`,`is_active`,`default_landing_page_uri`,`createts`,`modifyts`,`createusername`,`modifyusername`)
 VALUES('admin', 'admins', 'Y', '/Logistics/v2', '2015-01-07 15:55:40', '2015-01-07 15:55:40', 'TKMAGH4', '2015-01-07 15:55:40');
 
 --#################################
 --#	Create Role:
 --###
-INSERT INTO `storeelf`.`lh_user_roles`
+INSERT INTO `storeelf`.`se_user_roles`
 (`name`,`description`,`servlet_uri`,`is_active`,`is_admin`,`permission_1`,`createts`,`modifyts`,`createusername`,`modifyusername`)
 VALUES('Administrator', 'admin permissions', '/*', 'Y', 'Y', '', '2015-01-07 15:55:40', '2015-01-07 15:55:40', 'TKMAGH4', 'TKMAGH4');
 
 --#################################
 --#	Create Permissions:
 --###
-INSERT INTO `storeelf`.`lh_user_permissions`
+INSERT INTO `storeelf`.`se_user_permissions`
 (`section`,`function`,`servlet_uri`)
 VALUES
 ('dashboard', 'create', '/*/*'),
@@ -53,14 +53,14 @@ VALUES
 --##########################################################
 --#	Add User to Group:
 --###
-INSERT INTO `storeelf`.`lh_user_group_list`
+INSERT INTO `storeelf`.`se_user_group_list`
 (`user_group_key`,`username`,`createts`,`modifyts`,`createusername`,`modifyusername`)
 VALUES ('123456789', 'TKMAGH4', '2015-01-07 15:55:40', '2015-01-07 15:55:40', 'TKMAGH4', 'TKMAGH4');
 
 --##########################################################
 --#	Add Group to Role:
 --###
-UPDATE `storeelf`.`lh_user_roles`
+UPDATE `storeelf`.`se_user_roles`
 SET
 `user_group_key` = '123456789', `modifyts` = '2015-01-07 15:55:40', `modifyusername` = 'TKMAGH4'
 WHERE `user_role_key` = '987654321';
@@ -68,7 +68,7 @@ WHERE `user_role_key` = '987654321';
 --##########################################################
 --#	Add Permission(s) to Role:
 --###
-INSERT INTO `storeelf`.`lh_user_role_list`
+INSERT INTO `storeelf`.`se_user_role_list`
 (`user_role_key`, `user_permission_key`)
 VALUES
 ('987654321', '1'),
@@ -99,7 +99,7 @@ VALUES
 
 
 storeelf database tables:
-	CREATE TABLE `lh_user` (
+	CREATE TABLE `se_user` (
 	  `username` varchar(24) NOT NULL COMMENT 'TK123456',
 	  `password` varchar(45) DEFAULT NULL,
 	  `first_name` varchar(45) DEFAULT NULL,
@@ -117,7 +117,7 @@ storeelf database tables:
 	  UNIQUE KEY `username_UNIQUE` (`username`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-	CREATE TABLE `lh_user_group` (
+	CREATE TABLE `se_user_group` (
 	  `user_group_key` varchar(24) NOT NULL,
 	  `name` varchar(45) NOT NULL,
 	  `description` varchar(45) DEFAULT NULL,
@@ -130,7 +130,7 @@ storeelf database tables:
 	  PRIMARY KEY (`user_group_key`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-	CREATE TABLE `lh_user_group_list` (
+	CREATE TABLE `se_user_group_list` (
 	  `user_group_list_key` varchar(24) NOT NULL,
 	  `user_group_key` varchar(45) NOT NULL,
 	  `username` varchar(24) DEFAULT NULL,
@@ -142,11 +142,11 @@ storeelf database tables:
 	  UNIQUE KEY `user_group_list_key_UNIQUE` (`user_group_list_key`),
 	  KEY `username_idx` (`username`),
 	  KEY `user_group_key_idx` (`user_group_key`),
-	  CONSTRAINT `user_group_key` FOREIGN KEY (`user_group_key`) REFERENCES `lh_user_group` (`user_group_key`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-	  CONSTRAINT `username` FOREIGN KEY (`username`) REFERENCES `lh_user` (`username`) ON DELETE NO ACTION ON UPDATE NO ACTION
+	  CONSTRAINT `user_group_key` FOREIGN KEY (`user_group_key`) REFERENCES `se_user_group` (`user_group_key`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	  CONSTRAINT `username` FOREIGN KEY (`username`) REFERENCES `se_user` (`username`) ON DELETE NO ACTION ON UPDATE NO ACTION
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-	CREATE TABLE `lh_user_roles` (
+	CREATE TABLE `se_user_roles` (
 	  `user_role_key` varchar(24) NOT NULL,
 	  `user_group_key` varchar(24) DEFAULT NULL,
 	  `name` varchar(45) NOT NULL,
@@ -166,10 +166,10 @@ storeelf database tables:
 	  PRIMARY KEY (`user_role_key`),
 	  UNIQUE KEY `user_role_key_UNIQUE` (`user_role_key`),
 	  KEY `user_group_key_idx` (`user_group_key`),
-	  CONSTRAINT `user_group_key` FOREIGN KEY (`user_group_key`) REFERENCES `lh_user_group` (`user_group_key`) ON DELETE NO ACTION ON UPDATE NO ACTION
+	  CONSTRAINT `user_group_key` FOREIGN KEY (`user_group_key`) REFERENCES `se_user_group` (`user_group_key`) ON DELETE NO ACTION ON UPDATE NO ACTION
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-	CREATE TABLE `lh_user_role_list` (
+	CREATE TABLE `se_user_role_list` (
 	  `user_role_permission_key` varchar(24) NOT NULL,
 	  `user_role_key` varchar(24) NOT NULL,
 	  `user_permission_key` varchar(24) NOT NULL,
@@ -177,12 +177,12 @@ storeelf database tables:
 	  UNIQUE KEY `user_role_permission_key_UNIQUE` (`user_role_permission_key`),
 	  KEY `role_idx` (`user_role_key`),
 	  KEY `permission_idx` (`user_permission_key`),
-	  CONSTRAINT `user_permission_key` FOREIGN KEY (`user_permission_key`) REFERENCES `lh_user_permissions` (`user_permission_key`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-	  CONSTRAINT `user_role_key` FOREIGN KEY (`user_role_key`) REFERENCES `lh_user_roles` (`user_role_key`) ON DELETE NO ACTION ON UPDATE NO ACTION
+	  CONSTRAINT `user_permission_key` FOREIGN KEY (`user_permission_key`) REFERENCES `se_user_permissions` (`user_permission_key`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	  CONSTRAINT `user_role_key` FOREIGN KEY (`user_role_key`) REFERENCES `se_user_roles` (`user_role_key`) ON DELETE NO ACTION ON UPDATE NO ACTION
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-	CREATE TABLE `lh_user_permissions` (
+	CREATE TABLE `se_user_permissions` (
 	  `user_permission_key` varchar(24) NOT NULL,
 	  `section` varchar(48) NOT NULL,
 	  `function` varchar(7) NOT NULL,
@@ -193,4 +193,4 @@ storeelf database tables:
 
 
 
-insert into `storeelf`.`lh_user_session` (`username`,`session_id`,`createts`,`expirets`) values('TKMAGH4',concat(	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@lid)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed)*36+1, 1)),'2015-05-07 15:55:40','2015-05-07 15:55:40');
+insert into `storeelf`.`se_user_session` (`username`,`session_id`,`createts`,`expirets`) values('TKMAGH4',concat(	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@lid)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed:=round(rand(@seed)*4294967296))*36+1, 1),	substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', rand(@seed)*36+1, 1)),'2015-05-07 15:55:40','2015-05-07 15:55:40');

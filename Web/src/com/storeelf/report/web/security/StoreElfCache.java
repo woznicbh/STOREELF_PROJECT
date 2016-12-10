@@ -255,7 +255,7 @@ public class StoreElfCache implements Cache{
 			conn = getConnection();
 			stmnt = conn.createStatement();
 			result = stmnt.executeQuery(
-					"SELECT session, MAX(user_session_key) FROM storeelf.lh_user_session WHERE session_id = '"
+					"SELECT session, MAX(user_session_key) FROM storeelf.se_user_session WHERE session_id = '"
 							+ session_id + "' AND sysdate() < expirets");
 			Object output_session_object = null;
 
