@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -89,54 +90,58 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 	 */
 	public void sign_up(String requestedPage, HttpServletRequest request,
 			HttpServletResponse response) {
-		String chart_type = null;
 		String response_content = "-error-";
 		PrintWriter responseWriter = null;
 		String jsp_include_page = "/dashboard_includes/sign_up/sign_up.jsp";
 
-		logger.debug("DashboardServlet : quickMetricsResponse | "
-				+ requestedPage + "|" + request.getParameter("chart"));
-
 		try {
 			if (StringUtils.equals(request.getMethod(), "POST")) {
 
-			String firstName = "";
-			String lastName = "";
-			String email = "";
-			String city = "";
-			String state = "";
-			String zip = "";
-			String username = "";
-			String password = SecurityUtils.symmetricEncrypt("", Constants.STOREELF_CERT_KEY);
-			
-			Stripe.apiKey = StoreElfConstants.STRIPE_TEST_KEY;
-			
-			Map<String, Object> custParams = new HashMap<String, Object>();
-			custParams.put("email", email);
+				String firstName = "";
+				String lastName = "";
+				String email = "";
+				String city = "";
+				String state = "";
+				String zip = "";
+				String username = "";
+				String password = SecurityUtils.symmetricEncrypt("", StoreElfConstants.STOREELF_CERT_KEY);
 
-			Customer customer = Customer.create(custParams);
-			
-			String stripeId = customer.getId();
-			
-			Map<String, Object> subParams = new HashMap<String, Object>();
-			subParams.put("customer", stripeId);
-			subParams.put("plan", "StoreElf_Monthly");
-			subParams.put("tax_percent", 5.05);
-			subParams.put("trial_period_days", 30);
+				Stripe.apiKey = StoreElfConstants.STRIPE_TEST_KEY;
 
-			Subscription subscription = Subscription.create(subParams);
-			
-			
-			//TODO add user to the db;
-				
+				Map<String, Object> custParams = new HashMap<String, Object>();
+				custParams.put("email", email);
+
+				Customer customer = Customer.create(custParams);
+
+				String stripeId = customer.getId();
+
+				Map<String, Object> subParams = new HashMap<String, Object>();
+				subParams.put("customer", stripeId);
+				subParams.put("plan", "StoreElf_Monthly");
+				subParams.put("tax_percent", 5.05);
+				subParams.put("trial_period_days", 30);
+
+				Subscription.create(subParams);
+
+				// TODO add user to the db;
+				// SQLUtils.insertUpdateMySql(Insert sql for creating user in
+				// se_user table and setting the account as
+				// inactive with a reason of "Pending Email Confirmation")
+				// SQLUtils.insertUpdateMySql(Insert sql for creating se_user_group_list record tied to se_user table)
+
+				String encryptUsername = Base64.getUrlEncoder().encodeToString(
+						SecurityUtils.symmetricEncrypt(username, StoreElfConstants.STOREELF_CERT_KEY).getBytes());
+
+				// TODO send sign up confirmation email with encoded/encrypted
+				// username as input parameter
+
+				responseWriter = response.getWriter();
+				responseWriter.write("Success");
+				responseWriter.flush();
+				responseWriter.close();
 
 			} else {
-				// assume it's GET request, load JSP
-				// request.getRequestDispatcher(jsp_page).include(request,
-				// response);
-				request.getRequestDispatcher(
-						defaultPage + "?include=" + jsp_include_page).forward(
-						request, response);
+				request.getRequestDispatcher(defaultPage + "?include=" + jsp_include_page).forward(request, response);
 			}
 		}
 		// handle EVERY exception!
@@ -149,6 +154,55 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 		}
 	}
 
-	
+	public void email_validation(String requestedPage, HttpServletRequest request,
+			HttpServletResponse response) {
+		String chart_type = null;
+		String response_content = "-error-";
+		PrintWriter responseWriter = null;
+		String jsp_include_page = "/dashboard_includes/sign_up/sign_up.jsp";
+
+		try {
+			if (StringUtils.equals(request.getMethod(), "POST")) {
+
+				String username = SecurityUtils.symmetricDecrypt(
+						new String(Base64.getDecoder().decode("".getBytes()), "utf-8"),
+						StoreElfConstants.STOREELF_CERT_KEY);
+
+				Connection conRO = ReportActivator.getInstance().getConnection(StoreElfConstants.STOREELF_RO);
+
+				ConcurrentHashMap<Integer, HashMap<String, Object>> usernameHM = SQLUtils.getSQLResult(
+						"Select username from se_user where active='N' and inactive_reason='Pending Email Confirmation' and username='"
+								+ username + "'",
+						conRO);
+
+				if (!usernameHM.isEmpty()) {
+					SQLUtils.insertUpdateMySql(
+							"update se_user set active='Y' and inactive_reason='' where username='" + username + "'");
+					responseWriter = response.getWriter();
+					responseWriter.write("Success");
+					responseWriter.flush();
+					responseWriter.close();
+
+				} else {
+					responseWriter = response.getWriter();
+					responseWriter.write("Error");
+					responseWriter.flush();
+					responseWriter.close();
+
+				}
+
+			} else {
+				request.getRequestDispatcher(defaultPage + "?include=" + jsp_include_page).forward(request, response);
+			}
+		}
+		// handle EVERY exception!
+		catch (IOException e) {
+			e.printStackTrace();
+			logger.error("error processing request : IOException", e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("error processing request : Exception", e);
+		}
+	}
 
 }

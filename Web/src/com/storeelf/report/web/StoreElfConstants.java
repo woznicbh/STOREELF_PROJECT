@@ -2,6 +2,7 @@ package com.storeelf.report.web;
 
 public class StoreElfConstants {
 
+	public static String STOREELF_CERT_KEY = null;	
 	public static final String STOREELF_RO = "STOREELF_RO";
 	public static final String STOREELF_WR = "STOREELF_WR";
 	public static final String STRIPE_TEST_KEY = "sk_test_oZ0N2MoaeAjLi8Y0oGrpHmZq";

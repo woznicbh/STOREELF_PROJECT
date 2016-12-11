@@ -572,4 +572,32 @@ public class SQLUtils {
 		}
 
 	}
+	
+	public static void insertUpdateMySql(String sql) throws SQLException {
+		Connection con = null;
+		Statement stmt = null;
+		try {
+			con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
+			con.setAutoCommit(true);
+			stmt = con.createStatement();
+			stmt.executeUpdate(sql);
+			
+			logger.debug("My Sql updated !!!!");
+
+		} catch(CommunicationsException e){
+			logger.error("Closed the Connection due to : CommunicationsException");
+			if(con!=null){con.close();}
+		} catch (FileNotFoundException e) {
+			logger.error("error processing request : FileNotFoundException", e);
+		} catch (SQLException e) {
+			logger.error("error processing request : SQLException", e);
+		} catch (ClassNotFoundException e) {
+			logger.error("error processing request : ClassNotFoundException", e);
+		} catch (IOException e) {
+			logger.error("error processing request : IOException", e);
+		} finally {
+			if (stmt != null){stmt.close();}
+		}
+
+	}
 }
