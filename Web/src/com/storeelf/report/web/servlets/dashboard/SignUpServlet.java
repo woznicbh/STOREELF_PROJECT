@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,12 +33,18 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.storeelf.report.web.Constants;
+import com.storeelf.report.web.StoreElfConstants;
 import com.storeelf.report.web.init.ReportActivator;
 import com.storeelf.report.web.model.impl.GenericCountModel;
 import com.storeelf.report.web.model.impl.GenericTabularModel;
 import com.storeelf.report.web.model.impl.MultiColumnModal;
 import com.storeelf.report.web.servlets.StoreElfHttpServlet;
 import com.storeelf.util.SQLUtils;
+import com.storeelf.util.SecurityUtils;
+import com.stripe.Stripe;
+import com.stripe.model.Customer;
+import com.stripe.model.Plan;
+import com.stripe.model.Subscription;
 
 /**
  * Servlet implementation class OrderManagementServlet
@@ -93,6 +100,34 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 		try {
 			if (StringUtils.equals(request.getMethod(), "POST")) {
 
+			String firstName = "";
+			String lastName = "";
+			String email = "";
+			String city = "";
+			String state = "";
+			String zip = "";
+			String username = "";
+			String password = SecurityUtils.symmetricEncrypt("", Constants.STOREELF_CERT_KEY);
+			
+			Stripe.apiKey = StoreElfConstants.STRIPE_TEST_KEY;
+			
+			Map<String, Object> custParams = new HashMap<String, Object>();
+			custParams.put("email", email);
+
+			Customer customer = Customer.create(custParams);
+			
+			String stripeId = customer.getId();
+			
+			Map<String, Object> subParams = new HashMap<String, Object>();
+			subParams.put("customer", stripeId);
+			subParams.put("plan", "StoreElf_Monthly");
+			subParams.put("tax_percent", 5.05);
+			subParams.put("trial_period_days", 30);
+
+			Subscription subscription = Subscription.create(subParams);
+			
+			
+			//TODO add user to the db;
 				
 
 			} else {
