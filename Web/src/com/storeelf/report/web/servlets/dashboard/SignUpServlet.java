@@ -93,13 +93,14 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 		String response_content = "-error-";
 		PrintWriter responseWriter = null;
 		String jsp_include_page = "/dashboard_includes/sign_up/sign_up.jsp";
-
+		String confirmation_page = "/dashboard_includes/sign_up/confirmation.jsp";
 		try {
 			if (StringUtils.equals(request.getMethod(), "POST")) {
-
+				String token=request.getParameter("stripeToken");
+				String token_type=request.getParameter("stripeTokenType");
 				String firstName = "";
 				String lastName = "";
-				String email = "";
+				String email = request.getParameter("stripeEmail");
 				String city = "";
 				String state = "";
 				String zip = "";
@@ -135,10 +136,13 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 				// TODO send sign up confirmation email with encoded/encrypted
 				// username as input parameter
 
-				responseWriter = response.getWriter();
-				responseWriter.write("Success");
-				responseWriter.flush();
-				responseWriter.close();
+//				responseWriter = response.getWriter();
+//				responseWriter.write("Success");
+//				responseWriter.flush();
+//				responseWriter.close();
+				
+				//doesn't change url currently, can use redirect function if thats what we want.
+				request.getRequestDispatcher(defaultPage + "?include=" + confirmation_page).forward(request, response);
 
 			} else {
 				request.getRequestDispatcher(defaultPage + "?include=" + jsp_include_page).forward(request, response);
