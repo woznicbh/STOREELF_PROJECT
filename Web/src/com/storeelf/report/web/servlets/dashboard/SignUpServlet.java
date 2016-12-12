@@ -58,7 +58,7 @@ import com.stripe.model.Subscription;
  * @web.servlet name=OrderManagementServlet
  */
 public class SignUpServlet extends StoreElfHttpServlet<Object> {
-	static final Logger logger = Logger.getLogger(StoreElfComMetricsServlet.class);
+	static final Logger logger = Logger.getLogger(SignUpServlet.class);
 	private static final long serialVersionUID = 1L;
 	private String defaultPage = "/dashboard_includes/dashboard.jsp";
 
