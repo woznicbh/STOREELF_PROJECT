@@ -10,6 +10,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 
 public class SecurityUtils {
 
@@ -115,5 +117,13 @@ public class SecurityUtils {
 			 e.printStackTrace();
 		 }
 		 return null;
+	 }
+	 
+	 public static Object returnSalt(){
+		 return new SecureRandomNumberGenerator().nextBytes();
+	 }
+	 
+	 public static String returnSaltedPassword(Object password, Object salt) {
+		 return new Sha256Hash(password, salt, 1024).toBase64();
 	 }
 }
