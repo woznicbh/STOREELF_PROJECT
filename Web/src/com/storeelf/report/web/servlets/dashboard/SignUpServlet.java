@@ -76,28 +76,49 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 			if (StringUtils.equals(request.getMethod(), "POST")) {
 				String token=request.getParameter("stripeToken");
 				String token_type=request.getParameter("stripeTokenType");
-				String firstName = "";
-				String lastName = "";
+				String firstName = request.getParameter("firstName");
+				String lastName = request.getParameter("lastName");;
 				String email = request.getParameter("stripeEmail");
-				String city = "";
-				String state = "";
-				String zip = "";
-				String username = "";
-				String password = SecurityUtils.symmetricEncrypt("", StoreElfConstants.STOREELF_CERT_KEY);
-
-				Customer customer 	= StripeUtils.createStripeCustomer(token, email);
-				Card 	 cc 		= StripeUtils.addAndReturnCC(token, customer);
+				String address = request.getParameter("address");
+				String city = request.getParameter("city");
+				String state = request.getParameter("state");
+				String zip = request.getParameter("zip");
+				String username = request.getParameter("username");
 				
-				String last4 = cc.getLast4();
-				String cardType = cc.getBrand();
-				String stripeId = customer.getId();
+				Object salt = SecurityUtils.returnSalt();
+				String saltedPass = SecurityUtils.returnSaltedPassword(request.getParameter("password"), salt);
 				
-				StripeUtils.addSubscription(stripeId);
+				Customer customer = null;
+				Card cc = null;
+				String last4 = null;
+				String cardType = null;
+				String stripeId = null;
+				
+				try {
+					customer = StripeUtils.createStripeCustomer(token, email);
+					cc = StripeUtils.addAndReturnCC(token, customer);
 
+					last4 = cc.getLast4();
+					cardType = cc.getBrand();
+					stripeId = customer.getId();
+
+					StripeUtils.addSubscription(stripeId);
+				} catch (Exception e){
+					logger.error("Unable to create Stripe Customer or Subscription for email : "+email);
+					logger.error("Stripe Error", e);
+					
+					responseWriter = response.getWriter();
+					responseWriter.write("Error");
+					responseWriter.flush();
+					responseWriter.close();
+				}
+				
 				// TODO add user to the db;
-				// SQLUtils.insertUpdateMySql(Insert sql for creating user in
-				// se_user table and setting the account as
-				// inactive with a reason of "Pending Email Confirmation")
+				SQLUtils.insertUpdateMySql("Insert into se_user (username,password, first_name, last_name, createts, modifyts, salt, "
+				 		+ "email_address, address, city, state, zip, stripe_cust_id, cc_last4, cc_type, inactive_reason)"
+				 		+ "Values('"+username+"','"+saltedPass+"','"+firstName+"','"+lastName+"',NOW(),NOW(),'"+salt+"',"
+				 				+ "'"+email+"','"+address+"','"+city+"','"+state+"','"+zip+"','"+token+"','"+last4+"','"+cardType+"'"
+				 						+ ",'Pending Email Confirmation')");
 				// SQLUtils.insertUpdateMySql(Insert sql for creating se_user_group_list record tied to se_user table)
 
 				String encryptUsername = Base64.getUrlEncoder().encodeToString(
@@ -106,12 +127,11 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 				// TODO send sign up confirmation email with encoded/encrypted
 				// username as input parameter
 
-//				responseWriter = response.getWriter();
-//				responseWriter.write("Success");
-//				responseWriter.flush();
-//				responseWriter.close();
 				
 				//doesn't change url currently, can use redirect function if thats what we want.
+				
+				/*Ben - Can we create a simple "please check your email for confirmation" page and forward there? 
+				I think that makes the most sense. Agree?*/
 				request.getRequestDispatcher(defaultPage + "?include=" + confirmation_page).forward(request, response);
 
 			} else {
@@ -152,10 +172,9 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 				if (!usernameHM.isEmpty()) {
 					SQLUtils.insertUpdateMySql(
 							"update se_user set active='Y' and inactive_reason='' where username='" + username + "'");
-					responseWriter = response.getWriter();
-					responseWriter.write("Success");
-					responseWriter.flush();
-					responseWriter.close();
+					
+					//this should forward to the Sign in page when username has been validated through email
+					request.getRequestDispatcher(defaultPage + "?include=" + "sign_in_page").forward(request, response);
 
 				} else {
 					responseWriter = response.getWriter();

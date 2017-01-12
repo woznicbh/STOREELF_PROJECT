@@ -248,7 +248,7 @@ public class SQLUtils {
 					}
 	
 					row.put(column_names.get(i).toUpperCase(), rset.getObject(i));
-					logger.trace("Column: " + (column_names.get(i).toUpperCase()+"").toUpperCase() + "\nValue: " + rset.getObject(i));
+					logger.debug("Column: " + (column_names.get(i).toUpperCase()+"").toUpperCase() + "\nValue: " + rset.getObject(i));
 				}
 				resultmap.put(rowcount, row);
 			}
@@ -577,7 +577,7 @@ public class SQLUtils {
 		Connection con = null;
 		Statement stmt = null;
 		try {
-			con = ReportActivator.getInstance().getConnection(Constants.STOREELF_RO);
+			con = ReportActivator.getInstance().getConnection(Constants.STOREELF_WR);
 			con.setAutoCommit(true);
 			stmt = con.createStatement();
 			stmt.executeUpdate(sql);

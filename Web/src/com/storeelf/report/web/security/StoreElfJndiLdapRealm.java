@@ -87,6 +87,8 @@ public class StoreElfJndiLdapRealm extends JndiLdapRealm{
 			String password = null;
 			String salt = null;
 			String saltedPass = null;
+			String active = null;
+			String inactive_reason = null;
 			try {
 				conRO = ReportActivator.getInstance().getConnection(StoreElfConstants.STOREELF_RO);
 			} catch (ClassNotFoundException | IOException | SQLException e) {
@@ -95,7 +97,7 @@ public class StoreElfJndiLdapRealm extends JndiLdapRealm{
 			
 			try {
 				ConcurrentHashMap<Integer, HashMap<String, Object>> userResults = SQLUtils.getSQLResult(
-						"Select password, salt from se_user where username = '"+principal+"'",
+						"Select password, salt, active, inactive_reason from se_user where username = '"+principal+"'",
 						conRO);
 				
 				if(userResults.isEmpty()){
@@ -103,15 +105,25 @@ public class StoreElfJndiLdapRealm extends JndiLdapRealm{
 				} 
 				
 				for (HashMap<String, Object> map : userResults.values()) {
-					password =  String.valueOf(map.get("PASSWORD")).trim();
-					salt =  String.valueOf(map.get("SALT")).trim();
-					saltedPass = SecurityUtils.returnSaltedPassword(token.getCredentials(), salt);
+					active = String.valueOf(map.get("ACTIVE"));
 					
-					if(saltedPass.equals(password)){
-						return createAuthenticationInfo(token, principal, null, null);
+					if(active.equalsIgnoreCase("Y")) {
+					
+						password =  String.valueOf(map.get("PASSWORD")).trim();
+						salt =  String.valueOf(map.get("SALT")).trim();
+						saltedPass = SecurityUtils.returnSaltedPassword(token.getCredentials(), salt);
+						
+						if(saltedPass.equals(password)){
+							return createAuthenticationInfo(token, principal, null, null);
+						} else {
+							throw new NamingException("User: '" + (String) principal + "' not authenticated!");
+						}
+						
 					} else {
-						throw new NamingException("User: '" + (String) principal + "' not authenticated!");
-					}
+						inactive_reason = String.valueOf(map.get("INACTIVE_REASON")).trim();
+						
+						throw new NamingException("User: '" + (String) principal + "' Inactived due to : "+inactive_reason);
+					}		
 					
 				}
 				
