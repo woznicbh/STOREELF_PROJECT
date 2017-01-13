@@ -74,7 +74,7 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 		String confirmation_page = "/dashboard_includes/sign_up/confirmation.jsp";
 		try {
 			if (StringUtils.equals(request.getMethod(), "POST")) {
-				String token=request.getParameter("stripeToken");
+				String stripeToken=request.getParameter("stripeToken");
 				String token_type=request.getParameter("stripeTokenType");
 				String firstName = request.getParameter("firstName");
 				String lastName = request.getParameter("lastName");;
@@ -84,6 +84,7 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 				String state = request.getParameter("state");
 				String zip = request.getParameter("zip");
 				String username = request.getParameter("username");
+				String fbToken = request.getParameter("facebookToken");
 				
 				Object salt = SecurityUtils.returnSalt();
 				String saltedPass = SecurityUtils.returnSaltedPassword(request.getParameter("password"), salt);
@@ -95,8 +96,8 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 				String stripeId = null;
 				
 				try {
-					customer = StripeUtils.createStripeCustomer(token, email);
-					cc = StripeUtils.addAndReturnCC(token, customer);
+					customer = StripeUtils.createStripeCustomer(stripeToken, email);
+					cc = StripeUtils.addAndReturnCC(stripeToken, customer);
 
 					last4 = cc.getLast4();
 					cardType = cc.getBrand();
@@ -115,9 +116,9 @@ public class SignUpServlet extends StoreElfHttpServlet<Object> {
 				
 				// TODO add user to the db;
 				SQLUtils.insertUpdateMySql("Insert into se_user (username,password, first_name, last_name, createts, modifyts, salt, "
-				 		+ "email_address, address, city, state, zip, stripe_cust_id, cc_last4, cc_type, inactive_reason)"
+				 		+ "email_address, address, city, state, zip, facebook_token, stripe_cust_id, cc_last4, cc_type, inactive_reason)"
 				 		+ "Values('"+username+"','"+saltedPass+"','"+firstName+"','"+lastName+"',NOW(),NOW(),'"+salt+"',"
-				 				+ "'"+email+"','"+address+"','"+city+"','"+state+"','"+zip+"','"+token+"','"+last4+"','"+cardType+"'"
+				 				+ "'"+email+"','"+address+"','"+city+"','"+state+"','"+zip+"','"+fbToken+"','"+stripeToken+"','"+last4+"','"+cardType+"'"
 				 						+ ",'Pending Email Confirmation')");
 				// SQLUtils.insertUpdateMySql(Insert sql for creating se_user_group_list record tied to se_user table)
 
